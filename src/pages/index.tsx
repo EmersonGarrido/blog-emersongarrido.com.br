@@ -1,11 +1,12 @@
 import type { NextPage } from "next";
 import Link from "next/link";
-import { Header } from "components";
+import { Header, CardNews } from "components";
 
 const Home: NextPage = () => {
   return (
-    <div>
+    <div className="flex items-center justify-center flex-col">
       <Header />
+
       <div className="w-full bg-black h-[250px] md:h-[450px] flex items-center flex-col p-4 md:p-0 justify-center">
         <h1 className="text-[28px] font-bold md:text-[52px]">
           Blog do Emerson Garrido
@@ -15,9 +16,13 @@ const Home: NextPage = () => {
           <b>avançado.</b>
         </span>
       </div>
-      <div className="flex items-center justify-center p-4 font-thin text-[28px]">
-        <h1>Em desenvolvimento...</h1>
+
+      <div className="md:p-6 p-4 flex md:w-[1130px] flex-col md:flex-row justify-between items-center gap-3">
+        <CardNews />
+        <CardNews />
+        <CardNews />
       </div>
+
       <div className="text-[14px] font-thin">
         <span className="flex items-center justify-center">
           Todos os direitos reservados a
