@@ -1,36 +1,126 @@
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 
 const Header: React.FC = () => {
+  const [openModal, setOpenModal] = useState(false);
   return (
-    <div className="flex items-center justify-center w-full">
-      <div className="flex items-center justify-center w-[1200px] p-6">
-        <div className="w-full flex items-center gap-3">
-          <Link href="/">
-            <a>
-              <img src="/assets/logo.png" className="w-[50px] cursor-pointer" />
-            </a>
-          </Link>
+    <>
+      <div className="flex items-center justify-center w-full">
+        <div className="flex items-center justify-center w-[1200px] p-4">
+          <div className="w-full flex items-center gap-3">
+            <Link href="/">
+              <a>
+                <img
+                  src="/assets/logo.png"
+                  className="w-[50px] cursor-pointer"
+                />
+              </a>
+            </Link>
 
-          <h1 className="text-[#343434]">|</h1>
-          <h1 className="text-[#8257E6]">Blog</h1>
-          <ul className=" hidden items-center justify-center gap-5 ml-8 text-[#B4B4B4] text-[16px]">
-            <li className="hover:cursor-pointer hover:text-[#fff]">Back-end</li>
-            <li className="hover:cursor-pointer hover:text-[#fff]">
-              Front-end
-            </li>
-            <li className="hover:cursor-pointer hover:text-[#fff]"> Mobile </li>
-          </ul>
-        </div>
-        <div className=" w-[30px] cursor-pointer">
-          <Link href="https://github.com/EmersonGarrido">
-            <a target="_blank">
-              <img src="/assets/github-brands.svg" />
-            </a>
-          </Link>
+            <h1 className="text-[#343434]">|</h1>
+            <h1 className="text-[#8257E6]">Blog</h1>
+            <ul className=" hidden items-center justify-center gap-5 ml-8 text-[#B4B4B4] text-[16px]">
+              <li className="hover:cursor-pointer hover:text-[#fff]">
+                Back-end
+              </li>
+              <li className="hover:cursor-pointer hover:text-[#fff]">
+                Front-end
+              </li>
+              <li className="hover:cursor-pointer hover:text-[#fff]">
+                {" "}
+                Mobile{" "}
+              </li>
+            </ul>
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            <div className="cursor-pointer w-[30px]">
+              <Link href="https://github.com/EmersonGarrido">
+                <a target="_blank">
+                  <img src="/assets/github-brands.svg" />
+                </a>
+              </Link>
+            </div>
+            <button
+              onClick={() => setOpenModal(!openModal)}
+              className="font-light text-[14px] pl-2 pr-2 p-1 w-[120px] border-[0.1rem] rounded-full border-[#B4B4B4] hover:bg-white/5"
+            >
+              Fazer doação
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+      <div
+        className={`${
+          openModal ? "flex" : "hidden"
+        } items-start justify-center fixed top-0 z-50 w-full h-modal md:h-full bg-black/70 `}
+        style={{ margin: "0 auto" }}
+      >
+        <div className="relative p-4 w-full max-w-2xl h-full md:h-auto">
+          <div className="relative bg-white rounded-lg shadow dark:bg-gray-900">
+            <div className="flex justify-between items-start p-4 rounded-t border-b dark:border-gray-600">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Faça uma doação
+              </h3>
+              <button
+                onClick={() => setOpenModal(!openModal)}
+                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                data-modal-toggle="defaultModal"
+              >
+                <svg
+                  aria-hidden="true"
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+                <span className="sr-only">Fechar</span>
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                Este projeto não tem fins lucrativos, serve apenas para ajudar
+                outros programadores a ter uma base para iniciar seus próprios
+                projetos
+              </p>
+              <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                Espero de coração que esteja ajudando muita gente, se caso se
+                Sentir na vontade de doar qualquer valor basta realizar um PIX
+                Para QRCode abaixo ou copiando a chave do PIX.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-center w-full flex-col gap-4 p-4">
+              <img
+                src="/assets/qrcode-pix.png"
+                className="rounded-md w-[250px]"
+                alt=""
+              />
+              <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                Chave PIX: 94451ceb-7152-4e6d-8cb9-a32cc78c8311
+              </p>
+            </div>
+
+            <div className="flex justify-center items-center p-6 space-x-2 rounded-b border-t border-gray-200 dark:border-gray-600">
+              <button
+                onClick={() => setOpenModal(!openModal)}
+                data-modal-toggle="defaultModal"
+                type="button"
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              >
+                Obrigado
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 

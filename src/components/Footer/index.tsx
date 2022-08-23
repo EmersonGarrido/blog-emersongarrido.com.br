@@ -29,7 +29,8 @@ const Footer: React.FC = () => {
       </div>
       <div className="font-light text-[14px]">
         <span className="flex items-center justify-center">
-          Blog .dev | Todos os direitos reservados a
+          Blog .dev | Todos os direitos reservados | Este projeto é{" "}
+          <span className="font-bold ml-1">open-source</span>
         </span>
         <span className="flex items-center justify-center">
           <Link href="https://emersongarrido.com.br">

@@ -7,7 +7,10 @@ interface CardNewsProps {
 const CardNews: React.FC<CardNewsProps> = ({ className }) => {
   return (
     <div
-      className={`${className} mb-3 md:mb-0 shadow-md shadow-black/20 cursor-pointer hover:bg-black/25 hover:ease-out rounded-b-lg h-[315px] md:h-[420px]`}
+      style={{
+        transition: "all .25s cubic-bezier(.02,.01,.47,1)",
+      }}
+      className={`${className} hover:-translate-y-2 mb-3 md:mb-0 shadow-sm shadow-black/30 cursor-pointer hover:bg-black/25 hover:ease-out rounded-b-lg h-[315px] md:h-[400px]`}
     >
       <div className="h-[160px] p-3 md:w-[371px] w-[300px] max-w-[371px] rounded-t-lg bg-[url('https://blog.rocketseat.com.br/content/images/size/w600/2022/02/cleancode-rocketseat-blog.png')]">
         <img
