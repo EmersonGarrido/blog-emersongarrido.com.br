@@ -1,11 +1,25 @@
 import type { NextPage } from "next";
-import Link from "next/link";
-import { Header, CardNews, Footer, CardTopNews } from "components";
+import { fetchAPI } from "../lib/api";
+import { Header, CardNews, Footer, CardTopNews, Seo } from "components";
 
-const Home: NextPage = () => {
+interface ContentProps {
+  posts: any;
+  destaques: any;
+}
+
+const Home: NextPage<ContentProps> = ({ posts, destaques }) => {
   return (
     <div className="flex items-center justify-center flex-col">
       <Header />
+      <Seo
+        seo={{
+          metaTitle: ".dev | Blog do Garrido",
+          metaDescription:
+            "Blog pessoal do desenvolvedor Emerson Garrido @emersongarrido.dev no Instagram.",
+          image:
+            "https://www.infoguard.ch/hubfs/images/blog/infoguard-blog-easter-egg-1.jpg",
+        }}
+      />
 
       <div className="w-full bg-black h-[250px] md:h-[380px] flex items-center flex-col p-4 md:p-0 justify-center">
         <h1 className="text-[28px] font-bold md:text-[52px]">
@@ -18,13 +32,13 @@ const Home: NextPage = () => {
       </div>
 
       <div className="md:p-6 md:mt-10 flex md:w-[1130px] flex-col md:flex-row justify-between items-center gap-3">
-        <CardTopNews />
+        <CardTopNews data={destaques} />
       </div>
 
       <div className="md:p-6 p-4 flex md:w-[1130px] flex-col md:flex-row justify-between items-center gap-5">
-        <CardNews />
-        <CardNews />
-        <CardNews />
+        {posts.data?.map((post: any) => {
+          return <CardNews key={post.id} post={post} />;
+        })}
       </div>
 
       <Footer />
@@ -32,4 +46,22 @@ const Home: NextPage = () => {
   );
 };
 
+export async function getStaticProps() {
+  const [posts, destaques] = await Promise.all([
+    fetchAPI(
+      "/posts?pagination[limit]=6&sort=id:DESC&populate=media&populate=category&filters[highlight]=false"
+    ),
+    fetchAPI(
+      "/posts?pagination[limit]=2&populate=category&populate=media&sort=id:DESC&filters[highlight]=true"
+    ),
+  ]);
+
+  // await generateRssFeed()
+  return {
+    props: { posts, destaques },
+    revalidate: 1,
+  };
+}
+
 export default Home;
+

@@ -1,51 +1,57 @@
 import type { NextPage } from "next";
 import Link from "next/link";
-import { Header, Footer } from "components";
+import ReactHtmlParser from "react-html-parser";
+import { Header, Footer, Seo } from "components";
+import { fetchAPI } from "lib/api";
+import GetUpdated from "helpers/GetUpdated";
 
-const Home: NextPage = () => {
+const strapiUrl = "https://api-blog.emersongarrido.com.br";
+
+const Home: NextPage = ({ post }: any) => {
+  console.log(post.attributes);
   return (
     <div className="flex items-center justify-center flex-col">
       <Header />
 
-      <div className="w-full bg-black h-[250px] md:h-[380px] flex items-center flex-col p-4 md:p-0 justify-center"></div>
+      <Seo
+        seo={{
+          metaTitle: `.dev | ${post.attributes.title}`,
+          metaDescription: `${post.attributes.meta_description}`,
+          image: `${strapiUrl}${post.attributes.media.data.attributes.url}`,
+        }}
+      />
 
-      <div className="md:p-6 md:mt-10 flex  md:w-[1130px] flex-col justify-between items-center gap-3">
+      <div
+        className="w-full bg-black h-[250px] md:h-[380px] flex items-center flex-col p-4 md:p-0 justify-center"
+        style={{
+          backgroundSize: "cover",
+          backgroundImage: `url('${strapiUrl}${post.attributes.media.data.attributes.url}')`,
+        }}
+      ></div>
+
+      <div className="md:p-6 md:mt-10 flex  md:w-[900px] flex-col justify-between items-center gap-3">
         <div className="text-center w-full">
           <h1 className="text-[28px] font-bold md:text-[42px] text-[#B1B1B1]">
-            Boas práticas para devs em início de carreira
+            {post.attributes.title}
           </h1>
           <span className="text-[14px] md:text-[18px] text-center text-[#B1B1B1]">
-            Conteúdos focados em desenvolvimento e tutoriais do <b>básico</b> ao{" "}
-            <b>avançado.</b>
+            {post.attributes.meta_description}
           </span>
           <div className="text-center text-[14px] font-bold text-[#B6B7F6] mt-10 mb-10">
-            <p>Carreira • 23 de Mai de 2022</p>
+            <p>
+              {post.attributes.category.data.attributes.title} •{" "}
+              {GetUpdated(post?.attributes?.updatedAt)}
+            </p>
           </div>
         </div>
 
         <div className="flex flex-col gap-4 text-[#B1B1B1]">
-          <h1 className="text-[28px] font-bold">Defina sua jornada</h1>
-          <p>
-            Antes de tudo, você precisa saber para onde está indo. Iniciantes na
-            programação costumam se perder em meio a tanta informação. Você
-            precisa ter objetivos bem definidos para traçar a melhor rota de
-            evolução na carreira. Certifique-se de ter uma base sólida nos
-            fundamentos da programação. Só depois de conhecer o básico, você
-            saberá para onde seguir. Esse curso gratuito ensina programação
-            desde o marco zero, para quem nunca teve contato com tecnologia e
-            ajuda a consolidar conhecimentos padrões.
-          </p>
-          <h1 className="text-[28px] font-bold">Escolha uma linguagem</h1>
-          <p>
-            Conhecer uma única tecnologia profundamente vai te ajudar mais que
-            saber várias superficialmente. Isso não significa que você nunca
-            poderá aprender outras no futuro, apenas que vai direcionar seu foco
-            para um objetivo de aprendizagem. Dominando uma linguagem você se
-            aproxima de empresas que costumam buscar por pessoas que cumpram
-            papéis específicos em um time de tecnologia. Acompanhando a evolução
-            das ferramentas que usa, você não deixa que suas aplicações fiquem
-            ultrapassadas e continua relevante para o mercado.
-          </p>
+          {ReactHtmlParser(
+            post.attributes.content.replace(
+              /\/uploads\//gi,
+              `${strapiUrl}/uploads/`
+            )
+          )}
         </div>
       </div>
 
@@ -72,3 +78,26 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+export const getStaticPaths = async () => {
+  return {
+    paths: [], //indicates that no page needs be created at build time
+    fallback: "blocking", //indicates the type of fallback
+  };
+};
+
+export async function getStaticProps({ params }: any) {
+  const [post] = await Promise.all([
+    fetchAPI(
+      `/posts?filters[slug]=${params.slug}&populate=category&populate=media`
+    ),
+  ]);
+
+  return {
+    props: {
+      post: post.data[0],
+    },
+    revalidate: 60,
+  };
+}
+

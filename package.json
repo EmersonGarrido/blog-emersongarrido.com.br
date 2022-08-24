@@ -12,17 +12,20 @@
     "@fortawesome/fontawesome-svg-core": "^6.1.2",
     "@fortawesome/free-solid-svg-icons": "^6.1.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
+    "date-fns": "^2.29.2",
     "next": "12.2.5",
     "next-themes": "^0.2.0",
     "nprogress": "^0.2.0",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-html-parser": "^2.0.2"
   },
   "devDependencies": {
     "@types/node": "18.7.9",
     "@types/nprogress": "^0.2.0",
     "@types/react": "18.0.17",
     "@types/react-dom": "18.0.6",
+    "@types/react-html-parser": "^2.0.2",
     "autoprefixer": "^10.4.8",
     "eslint": "8.22.0",
     "eslint-config-next": "12.2.5",
