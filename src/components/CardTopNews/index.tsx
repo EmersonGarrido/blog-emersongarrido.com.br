@@ -54,7 +54,9 @@ const CardTopNews: React.FC<CardTopNewsProps> = ({ data }) => {
         </div>
       </Link>
 
-      <CardNews post={data.data[1]} />
+      <div className="p-3 md:p-0">
+        <CardNews post={data.data[1]} />
+      </div>
     </div>
   );
 };
