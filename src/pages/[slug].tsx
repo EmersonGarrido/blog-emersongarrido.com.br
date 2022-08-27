@@ -55,7 +55,15 @@ const Home: NextPage = ({ post }: any) => {
         </div>
       </div>
 
-      <div className="border-t-white/5 border-t-[0.1rem] md:p-6 md:mt-10 flex  w-full flex-col justify-between items-center gap-3">
+      <div className="p-4">
+        <Link href={`/`}>
+          <button className=" bg-[#4C3583] pl-4 pr-4 pt-2 pb-2 rounded-md">
+            Voltar inicio
+          </button>
+        </Link>
+      </div>
+
+      <div className="border-t-white/5 border-t-[0.1rem] pt-5 md:p-6 md:mt-10 flex  w-full flex-col justify-between items-center gap-3">
         <div className="flex gap-4 items-center justify-start">
           <img
             src="http://github.com/EmersonGarrido.png"
