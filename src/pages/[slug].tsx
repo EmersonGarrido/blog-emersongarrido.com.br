@@ -29,7 +29,7 @@ const Home: NextPage = ({ post }: any) => {
         }}
       ></div>
 
-      <div className="md:p-6 md:mt-10 flex  md:w-[900px] flex-col justify-between items-center gap-3">
+      <div className="md:p-6 md:mt-10 flex  md:w-[900px] w-[360px] mb-6 flex-col justify-between items-center gap-3">
         <div className="text-center w-full">
           <h1 className="text-[28px] font-bold md:text-[42px] text-[#B1B1B1]">
             {post.attributes.title}
