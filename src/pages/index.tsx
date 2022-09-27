@@ -31,14 +31,16 @@ const Home: NextPage<ContentProps> = ({ posts, destaques }) => {
         </span>
       </div>
 
-      <div className="md:p-6 md:mt-10 flex md:w-[1130px] flex-col md:flex-row justify-between items-center gap-3">
+      <div className="flex items-center justify-center flex-col">
+        <div className="md:p-6 md:mt-10 flex md:w-[1130px] flex-col md:flex-row justify-between items-center gap-3">
         <CardTopNews data={destaques} />
       </div>
 
-      <div className="md:p-6 p-4 flex md:w-[1130px] flex-col md:flex-row justify-between items-center gap-5">
+        <div className="grid grid-cols-1 gap-10 w-[1130px] md:w-[1130px] md:grid-cols-3 ml-12">
         {posts.data?.map((post: any) => {
           return <CardNews key={post.id} post={post} />;
         })}
+      </div>
       </div>
 
       <Footer />
@@ -56,7 +58,6 @@ export async function getStaticProps() {
     ),
   ]);
 
-  // await generateRssFeed()
   return {
     props: { posts, destaques },
     revalidate: 1,
