@@ -28,7 +28,7 @@ const Home: NextPage = ({ post }: any) => {
         }}
       ></div>
 
-      <div className="md:p-6 md:mt-10 flex  md:w-[900px] w-[360px] mb-6 flex-col justify-between items-center gap-3">
+      <div className="md:p-6 md:mt-10 flex p-4 md:w-[900px] w-full mb-6 flex-col justify-between items-center gap-3">
         <div className="text-center w-full">
           <h1 className="text-[28px] font-bold md:text-[42px] text-[#B1B1B1]">
             {post.attributes.title}
@@ -44,7 +44,7 @@ const Home: NextPage = ({ post }: any) => {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 text-[#B1B1B1]">
+        <div className="flex flex-col p-4 md:p-0 w-full gap-4 text-[#B1B1B1]">
           {ReactHtmlParser(
             post.attributes.content.replace(
               /\/uploads\//gi,
