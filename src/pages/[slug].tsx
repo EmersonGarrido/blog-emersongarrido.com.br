@@ -8,7 +8,6 @@ import GetUpdated from "helpers/GetUpdated";
 const strapiUrl = "https://api-blog.emersongarrido.com.br";
 
 const Home: NextPage = ({ post }: any) => {
-  console.log(post.attributes);
   return (
     <div className="flex items-center justify-center flex-col">
       <Header />

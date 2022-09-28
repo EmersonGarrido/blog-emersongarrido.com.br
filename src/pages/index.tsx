@@ -32,11 +32,11 @@ const Home: NextPage<ContentProps> = ({ posts, destaques }) => {
       </div>
 
       <div className="flex items-center justify-center flex-col">
-        <div className="md:p-6 md:mt-10 flex md:w-[1130px] flex-col md:flex-row justify-between items-center gap-3">
+        <div className="md:p-6 md:mt-10 flex md:w-[1130px] w-full flex-col md:flex-row justify-between items-center gap-3">
         <CardTopNews data={destaques} />
       </div>
 
-        <div className="grid grid-cols-1 gap-10 w-[1130px] md:w-[1130px] md:grid-cols-3 ml-12">
+        <div className="grid grid-cols-1 md:gap-10 w-full md:w-[1130px] md:grid-cols-3 md:ml-12">
         {posts.data?.map((post: any) => {
           return <CardNews key={post.id} post={post} />;
         })}
