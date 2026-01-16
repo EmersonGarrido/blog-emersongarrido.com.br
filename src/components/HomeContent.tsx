@@ -135,8 +135,8 @@ export default function HomeContent({ posts }: HomeContentProps) {
             transition={{ duration: 0.4, delay: 0.45 }}
             className="mt-4 p-3 border border-neutral-800 rounded-xl"
           >
-            <span className="flex items-center gap-1 text-neutral-500 text-sm mb-2">
-              From <span className="text-base">🇧🇷</span>
+            <span className="flex items-center gap-2 text-neutral-500 text-sm mb-2">
+              From <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/22px-Flag_of_Brazil.svg.png" alt="Brasil" title="Brasil" className="h-4 rounded-sm" />
             </span>
             <div className="flex items-center gap-3">
               <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Bandeira_de_Mato_Grosso_do_Sul.svg/23px-Bandeira_de_Mato_Grosso_do_Sul.svg.png" alt="MS" title="Mato Grosso do Sul" className="h-4 rounded-sm" />
