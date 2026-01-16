@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     description: '30 anos. Documentando meu dia a dia, pensamentos e reflexões.',
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/api/og?title=Emerson%20Garrido&excerpt=30%20anos.%20Documentando%20meu%20dia%20a%20dia%2C%20pensamentos%20e%20reflex%C3%B5es.',
         width: 1200,
         height: 630,
         alt: 'Emerson Garrido',
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Emerson Garrido',
     description: '30 anos. Documentando meu dia a dia, pensamentos e reflexões.',
-    images: ['/og-image.jpg'],
+    images: ['/api/og?title=Emerson%20Garrido&excerpt=30%20anos.%20Documentando%20meu%20dia%20a%20dia%2C%20pensamentos%20e%20reflex%C3%B5es.'],
     creator: '@emersongarrido',
   },
   robots: {
