@@ -45,6 +45,7 @@ function MenuButton({
 
 export default function RichEditor({ content, onChange, placeholder }: RichEditorProps) {
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: {
