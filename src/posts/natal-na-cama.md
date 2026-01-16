@@ -2,6 +2,9 @@
 title: "Natal na cama"
 date: "2026-01-16T00:30:00-04:00"
 excerpt: "Meu natal foi um lixo. Passei deitado na cama sem conseguir levantar pra nada."
+categories:
+  - saúde mental
+  - diário
 ---
 
 Meu natal foi um lixo.

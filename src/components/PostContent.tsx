@@ -76,17 +76,48 @@ export default function PostContent({ post, contentHtml, formattedDate, newerPos
             </motion.div>
           </div>
 
+          {/* Image */}
+          {post.image && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.35 }}
+              className="relative w-full aspect-video"
+            >
+              <Image
+                src={post.image}
+                alt=""
+                fill
+                className="object-cover"
+              />
+            </motion.div>
+          )}
+
           {/* Content */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.4 }}
-            className="px-5 pb-6"
+            className="px-5 pb-6 pt-4"
           >
             <div
-              className="prose text-[17px] text-neutral-300"
+              className="prose font-serif text-[18px] text-neutral-300 leading-relaxed"
               dangerouslySetInnerHTML={{ __html: contentHtml }}
             />
+
+            {/* Categories */}
+            {post.categories && post.categories.length > 0 && (
+              <div className="mt-6 pt-4 border-t border-neutral-800 flex flex-wrap gap-2">
+                {post.categories.map((category) => (
+                  <span
+                    key={category}
+                    className="text-xs px-3 py-1 bg-neutral-800 text-neutral-400 rounded-full"
+                  >
+                    {category}
+                  </span>
+                ))}
+              </div>
+            )}
           </motion.div>
         </motion.article>
 

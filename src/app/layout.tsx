@@ -1,11 +1,18 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Lora } from 'next/font/google'
 import { Providers } from './providers'
 import './globals.css'
 
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
+  variable: '--font-inter',
+})
+
+const lora = Lora({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-lora',
 })
 
 const siteDescription = 'Cansei de pedir ajuda pra pessoas próximas, resolvi relatar publicamente o que ando passando. Não tá fácil, mas sigo tentando.'
@@ -77,7 +84,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/avatar.jpg" />
         <meta name="theme-color" content="#000000" />
       </head>
-      <body className={`${inter.className} bg-black min-h-screen`}>
+      <body className={`${inter.variable} ${lora.variable} font-sans bg-black min-h-screen`}>
         <Providers>{children}</Providers>
       </body>
     </html>

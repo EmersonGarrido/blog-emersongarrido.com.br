@@ -2,6 +2,9 @@
 title: "Virada no sofá"
 date: "2026-01-16T00:50:00-04:00"
 excerpt: "Na virada do ano minha mãe veio aqui em casa, me abraçou e disse que me ama. Não fizemos nada além disso."
+categories:
+  - família
+  - diário
 ---
 
 A virada do ano passei no sofá.

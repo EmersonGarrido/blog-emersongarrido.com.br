@@ -12,7 +12,7 @@ interface HomeContentProps {
   posts: Post[]
 }
 
-const POSTS_PER_PAGE = 5
+const POSTS_PER_PAGE = 3
 
 export default function HomeContent({ posts }: HomeContentProps) {
   const { t, locale } = useLocale()

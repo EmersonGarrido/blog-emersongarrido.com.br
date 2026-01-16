@@ -2,6 +2,8 @@
 title: "Preciso mudar"
 date: "2025-01-15T21:00:00-04:00"
 excerpt: "Escrevi um livro, mas não sei se vou publicar. Está guardado a sete chaves e algumas pessoas tiveram acesso a ele... pessoas que não deveriam."
+categories:
+  - reflexões
 ---
 
 Escrevi um livro, mas não sei se vou publicar. Tá guardado a sete chaves.

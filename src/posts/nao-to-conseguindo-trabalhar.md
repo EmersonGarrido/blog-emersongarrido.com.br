@@ -2,6 +2,9 @@
 title: "Não tô conseguindo trabalhar"
 date: "2026-01-15T23:15:00-04:00"
 excerpt: "Tô fazendo janta e pensando no que escrever. Não é fácil se abrir pro mundo."
+categories:
+  - saúde mental
+  - diário
 ---
 
 Não tô conseguindo trabalhar.

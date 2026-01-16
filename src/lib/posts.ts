@@ -11,6 +11,8 @@ export interface Post {
   title: string
   date: string
   excerpt?: string
+  image?: string
+  categories?: string[]
   content: string
   contentHtml?: string
 }
@@ -34,6 +36,8 @@ export function getAllPosts(): Post[] {
         title: data.title || slug,
         date: data.date || new Date().toISOString(),
         excerpt: data.excerpt || content.slice(0, 160) + '...',
+        image: data.image,
+        categories: data.categories || [],
         content,
       }
     })
@@ -56,6 +60,8 @@ export function getPostBySlug(slug: string): Post | null {
     title: data.title || slug,
     date: data.date || new Date().toISOString(),
     excerpt: data.excerpt,
+    image: data.image,
+    categories: data.categories || [],
     content,
   }
 }

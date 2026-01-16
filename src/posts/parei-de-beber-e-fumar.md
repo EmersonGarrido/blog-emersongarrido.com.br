@@ -2,6 +2,8 @@
 title: "Parei de beber e fumar"
 date: "2026-01-16T00:10:00-04:00"
 excerpt: "Minha vida anda bagunçada, mas pelo menos larguei o álcool e o cigarro. A única coisa que ainda uso é Venvanse pra ter foco."
+categories:
+  - saúde mental
 ---
 
 Minha vida anda bagunçada, mas pelo menos larguei o álcool e o cigarro.
