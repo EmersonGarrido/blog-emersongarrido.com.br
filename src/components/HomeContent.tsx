@@ -128,20 +128,42 @@ export default function HomeContent({ posts }: HomeContentProps) {
             {t.age}. {t.bio}
           </motion.p>
 
-          {/* Flags */}
+          {/* Location */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.45 }}
-            className="mt-3 flex items-center gap-2 flex-wrap"
+            className="mt-3 flex items-center gap-3 flex-wrap text-neutral-500 text-sm"
           >
-            <span className="text-lg" title="Brasil">🇧🇷</span>
-            <span className="text-xs px-2 py-1 bg-neutral-800 rounded-full text-neutral-400">MS</span>
-            <span className="text-xs px-2 py-1 bg-neutral-800 rounded-full text-neutral-400">DF</span>
-            <span className="text-xs px-2 py-1 bg-neutral-800 rounded-full text-neutral-400">RJ</span>
-            <span className="text-xs px-2 py-1 bg-neutral-800 rounded-full text-neutral-400">AM</span>
-            <span className="text-xs px-2 py-1 bg-neutral-800 rounded-full text-neutral-400">MT</span>
-            <span className="text-xs px-2 py-1 bg-neutral-800 rounded-full text-neutral-400">SP</span>
+            <span className="flex items-center gap-1">
+              From Brasil <span className="text-base">🇧🇷</span>
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-1" title="Mato Grosso do Sul">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Bandeira_de_Mato_Grosso_do_Sul.svg/20px-Bandeira_de_Mato_Grosso_do_Sul.svg.png" alt="MS" className="w-4 h-3 rounded-sm" />
+                <span className="text-xs text-neutral-600">MS</span>
+              </span>
+              <span className="flex items-center gap-1" title="Distrito Federal">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Bandeira_do_Distrito_Federal_%28Brasil%29.svg/20px-Bandeira_do_Distrito_Federal_%28Brasil%29.svg.png" alt="DF" className="w-4 h-3 rounded-sm" />
+                <span className="text-xs text-neutral-600">DF</span>
+              </span>
+              <span className="flex items-center gap-1" title="Rio de Janeiro">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Bandeira_do_estado_do_Rio_de_Janeiro.svg/20px-Bandeira_do_estado_do_Rio_de_Janeiro.svg.png" alt="RJ" className="w-4 h-3 rounded-sm" />
+                <span className="text-xs text-neutral-600">RJ</span>
+              </span>
+              <span className="flex items-center gap-1" title="Amazonas">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Bandeira_do_Amazonas.svg/20px-Bandeira_do_Amazonas.svg.png" alt="AM" className="w-4 h-3 rounded-sm" />
+                <span className="text-xs text-neutral-600">AM</span>
+              </span>
+              <span className="flex items-center gap-1" title="Mato Grosso">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Bandeira_de_Mato_Grosso.svg/20px-Bandeira_de_Mato_Grosso.svg.png" alt="MT" className="w-4 h-3 rounded-sm" />
+                <span className="text-xs text-neutral-600">MT</span>
+              </span>
+              <span className="flex items-center gap-1" title="São Paulo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Bandeira_do_estado_de_S%C3%A3o_Paulo.svg/20px-Bandeira_do_estado_de_S%C3%A3o_Paulo.svg.png" alt="SP" className="w-4 h-3 rounded-sm" />
+                <span className="text-xs text-neutral-600">SP</span>
+              </span>
+            </div>
           </motion.div>
 
           {/* Stats + WhatsApp */}
