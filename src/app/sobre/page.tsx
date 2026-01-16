@@ -26,7 +26,7 @@ export default function SobrePage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
-          <span className="font-semibold">{locale === 'en' ? 'About' : 'Sobre'}</span>
+          <span className="font-semibold">{locale === 'en' ? 'About me' : 'Sobre mim'}</span>
           <div className="w-12" />
         </div>
       </motion.header>
@@ -74,11 +74,34 @@ export default function SobrePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
-          className="space-y-6 text-neutral-300 text-[16px] leading-relaxed"
+          className="space-y-5 text-neutral-300 text-[16px] leading-relaxed"
         >
           <p>
-            {/* Escreva sua história aqui */}
-            Em breve vou contar um pouco da minha história por aqui...
+            Tenho 30 anos, faço 31 em 2026. Nasci em Campo Grande, MS, e hoje trabalho como programador e desenvolvedor de sistemas.
+          </p>
+
+          <p>
+            Já morei em muitos lugares: Campo Grande, São José do Rio Claro no Mato Grosso, Manaus, Rio de Janeiro, São Paulo — passei por Campinas, pela capital, por Igaratá — e Brasília, no Sudoeste. Muita mudança, muita estrada, muita fuga.
+          </p>
+
+          <p>
+            Porque era isso que eu tava fazendo esse tempo todo, fugindo. Sem saber que na verdade tava fugindo de mim mesmo. E isso é foda, porque não tem como fugir da própria cabeça. Ela vai junto pra onde você for.
+          </p>
+
+          <p>
+            Já tive 3 burnouts graves. Fui internado na Santa Casa de Campo Grande em coma. Aos 18 anos sofri um acidente e fiquei 2 anos numa cadeira de rodas, só voltei a andar depois de 2 cirurgias na perna.
+          </p>
+
+          <p>
+            Muita coisa aconteceu, muita coisa ainda tá acontecendo. Esse espaço aqui é pra documentar, pra colocar pra fora, pra não guardar tudo sozinho.
+          </p>
+
+          <p className="text-neutral-500 italic">
+            continua...
+          </p>
+
+          <p className="text-neutral-600 text-sm">
+            Última atualização: 16 de janeiro de 2026, 01:30
           </p>
         </motion.div>
 
