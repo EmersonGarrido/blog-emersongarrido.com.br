@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     if (format === 'csv') {
       const csv = [
         'email,name,status,created_at',
-        ...subscribers.map((s: { email: string; name: string; status: string; created_at: string }) =>
+        ...subscribers.map((s) =>
           `${s.email},${s.name || ''},${s.status},${s.created_at}`
         )
       ].join('\n')
