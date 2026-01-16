@@ -49,6 +49,7 @@ interface Comment {
   ip_address: string
   is_approved: boolean
   is_spam: boolean
+  is_edited?: boolean
   created_at: string
 }
 
@@ -62,6 +63,8 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<'analytics' | 'comments'>('analytics')
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
   const [totalSubscribers, setTotalSubscribers] = useState(0)
+  const [editingComment, setEditingComment] = useState<number | null>(null)
+  const [editContent, setEditContent] = useState('')
 
   const loadData = useCallback(async () => {
     try {
@@ -139,6 +142,31 @@ export default function AdminDashboard() {
       })
     }
     loadData()
+  }
+
+  const handleEditComment = async (id: number) => {
+    try {
+      await fetch('/api/admin/comments', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action: 'edit', content: editContent })
+      })
+      setEditingComment(null)
+      setEditContent('')
+      loadData()
+    } catch (error) {
+      console.error('Edit comment error:', error)
+    }
+  }
+
+  const startEditing = (comment: Comment) => {
+    setEditingComment(comment.id)
+    setEditContent(comment.content)
+  }
+
+  const cancelEditing = () => {
+    setEditingComment(null)
+    setEditContent('')
   }
 
   const formatDate = (dateStr: string) => {
@@ -744,10 +772,38 @@ export default function AdminDashboard() {
                           {comment.is_spam && (
                             <span className="px-2 py-0.5 bg-red-500/20 text-red-400 text-xs rounded">Spam</span>
                           )}
+                          {comment.is_edited && (
+                            <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs rounded">Editado</span>
+                          )}
                         </div>
-                        <p className="text-white/70 text-sm whitespace-pre-wrap">
-                          {comment.content}
-                        </p>
+                        {editingComment === comment.id ? (
+                          <div className="space-y-2">
+                            <textarea
+                              value={editContent}
+                              onChange={(e) => setEditContent(e.target.value)}
+                              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white/70 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                              rows={4}
+                            />
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleEditComment(comment.id)}
+                                className="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium rounded-lg transition-colors"
+                              >
+                                Salvar
+                              </button>
+                              <button
+                                onClick={cancelEditing}
+                                className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white/60 text-xs font-medium rounded-lg transition-colors"
+                              >
+                                Cancelar
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-white/70 text-sm whitespace-pre-wrap">
+                            {comment.content}
+                          </p>
+                        )}
                         <p className="text-white/20 text-xs mt-2">
                           IP: {comment.ip_address}
                         </p>
@@ -761,6 +817,17 @@ export default function AdminDashboard() {
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </button>
+                        )}
+                        {editingComment !== comment.id && (
+                          <button
+                            onClick={() => startEditing(comment)}
+                            className="p-2 text-blue-400 hover:bg-blue-400/20 rounded-lg transition-colors"
+                            title="Editar"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                           </button>
                         )}

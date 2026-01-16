@@ -9,6 +9,9 @@ interface Comment {
   author_name: string
   content: string
   created_at: string
+  is_edited?: boolean
+  likes_count?: number
+  is_liked?: boolean
 }
 
 interface CommentsProps {
@@ -90,8 +93,32 @@ export default function Comments({ postSlug }: CommentsProps) {
     })
   }
 
+  const handleCommentLike = async (commentId: number, isLiked: boolean) => {
+    try {
+      if (isLiked) {
+        const res = await fetch(`/api/comments/like?commentId=${commentId}`, { method: 'DELETE' })
+        const data = await res.json()
+        setComments(comments.map(c =>
+          c.id === commentId ? { ...c, likes_count: data.likes_count, is_liked: false } : c
+        ))
+      } else {
+        const res = await fetch('/api/comments/like', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ commentId })
+        })
+        const data = await res.json()
+        setComments(comments.map(c =>
+          c.id === commentId ? { ...c, likes_count: data.likes_count, is_liked: true } : c
+        ))
+      }
+    } catch (error) {
+      console.error('Like comment error:', error)
+    }
+  }
+
   return (
-    <div className="mt-8 pt-6 border-t border-[var(--border-color)]">
+    <div id="comments" className="mt-8 pt-6 border-t border-[var(--border-color)]">
       <h3 className="text-lg font-semibold mb-4">
         {locale === 'en' ? 'Comments' : 'Comentários'}
         {comments.length > 0 && ` (${comments.length})`}
@@ -182,16 +209,45 @@ export default function Comments({ postSlug }: CommentsProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
-                <div>
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-medium text-sm">{locale === 'en' ? 'Anonymous' : 'Anônimo'}</span>
-                  <span className="text-[var(--text-muted)] text-xs ml-2">
+                  <span className="text-[var(--text-muted)] text-xs">
                     {formatDate(comment.created_at)}
                   </span>
+                  {comment.is_edited && (
+                    <span className="text-[var(--text-muted)] text-xs italic">
+                      ({locale === 'en' ? 'edited' : 'editado'})
+                    </span>
+                  )}
                 </div>
               </div>
               <p className="text-[var(--text-secondary)] text-sm whitespace-pre-wrap">
                 {comment.content}
               </p>
+              {/* Like button */}
+              <div className="mt-3 flex items-center">
+                <button
+                  onClick={() => handleCommentLike(comment.id, comment.is_liked || false)}
+                  className={`flex items-center gap-1.5 text-xs transition-colors ${
+                    comment.is_liked ? 'text-red-500' : 'text-[var(--text-muted)] hover:text-red-500'
+                  }`}
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill={comment.is_liked ? 'currentColor' : 'none'}
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                  <span>{comment.likes_count || 0}</span>
+                </button>
+              </div>
             </motion.div>
           ))}
         </div>

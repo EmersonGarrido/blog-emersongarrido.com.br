@@ -190,7 +190,10 @@ export default function PostCard({ post, index }: PostCardProps) {
             </button>
 
             {/* Comments */}
-            <span className="flex items-center gap-1.5 text-sm text-[var(--text-muted)]">
+            <Link
+              href={`/post/${post.slug}#comments`}
+              className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-blue-400 transition-colors"
+            >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -200,7 +203,7 @@ export default function PostCard({ post, index }: PostCardProps) {
                 />
               </svg>
               <span>{commentsCount}</span>
-            </span>
+            </Link>
 
           </div>
         </div>
