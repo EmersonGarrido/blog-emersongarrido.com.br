@@ -4,16 +4,17 @@ import PostContent from '@/components/PostContent'
 import { getPostBySlug, getPostContent, getAllPostSlugs, getAllPosts } from '@/lib/posts'
 
 interface Props {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 export async function generateStaticParams() {
-  const slugs = getAllPostSlugs()
+  const slugs = await getAllPostSlugs()
   return slugs.map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = getPostBySlug(params.slug)
+  const { slug } = await params
+  const post = await getPostBySlug(slug)
 
   if (!post) {
     return { title: 'Post não encontrado' }
@@ -30,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: 'article',
       publishedTime: post.date,
       authors: ['Emerson Garrido'],
-      url: `https://emersongarrido.com.br/post/${params.slug}`,
+      url: `https://emersongarrido.com.br/post/${slug}`,
       images: [
         {
           url: ogImageUrl,
@@ -64,7 +65,8 @@ function formatDate(dateString: string): string {
 }
 
 export default async function PostPage({ params }: Props) {
-  const post = getPostBySlug(params.slug)
+  const { slug } = await params
+  const post = await getPostBySlug(slug)
 
   if (!post) {
     notFound()
@@ -74,10 +76,10 @@ export default async function PostPage({ params }: Props) {
   const formattedDate = formatDate(post.date)
 
   // Pegar todos os posts ordenados por data (mais recente primeiro)
-  const allPosts = getAllPosts()
+  const allPosts = await getAllPosts()
 
   // Encontrar índice do post atual
-  const currentIndex = allPosts.findIndex(p => p.slug === params.slug)
+  const currentIndex = allPosts.findIndex(p => p.slug === slug)
 
   // Post mais recente (anterior na lista) e mais antigo (próximo na lista)
   const newerPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null

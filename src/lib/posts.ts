@@ -1,10 +1,6 @@
-import fs from 'fs'
-import path from 'path'
-import matter from 'gray-matter'
+import { sql } from '@/lib/db'
 import { remark } from 'remark'
 import html from 'remark-html'
-
-const postsDirectory = path.join(process.cwd(), 'src/posts')
 
 export interface Post {
   slug: string
@@ -25,54 +21,82 @@ export function calculateReadingTime(content: string): number {
   return minutes < 1 ? 1 : minutes
 }
 
-export function getAllPosts(): Post[] {
-  if (!fs.existsSync(postsDirectory)) {
+export async function getAllPosts(): Promise<Post[]> {
+  try {
+    const posts = await sql`
+      SELECT
+        p.slug,
+        p.title,
+        p.excerpt,
+        p.content,
+        p.image,
+        p.published_at,
+        COALESCE(
+          (SELECT json_agg(c.name)
+           FROM categories c
+           JOIN post_categories pc ON pc.category_id = c.id
+           WHERE pc.post_id = p.id), '[]'
+        ) as categories
+      FROM posts p
+      WHERE p.published = true
+      ORDER BY p.published_at DESC
+    `
+
+    return posts.map(post => ({
+      slug: post.slug as string,
+      title: post.title as string,
+      date: post.published_at ? new Date(post.published_at as string).toISOString() : new Date().toISOString(),
+      excerpt: (post.excerpt as string) || (post.content as string).slice(0, 160) + '...',
+      image: post.image as string | undefined,
+      categories: Array.isArray(post.categories) ? post.categories : [],
+      content: post.content as string,
+      readingTime: calculateReadingTime(post.content as string)
+    }))
+  } catch (error) {
+    console.error('Error fetching posts from database:', error)
     return []
   }
-
-  const fileNames = fs.readdirSync(postsDirectory)
-  const allPosts = fileNames
-    .filter((name) => name.endsWith('.md'))
-    .map((fileName) => {
-      const slug = fileName.replace(/\.md$/, '')
-      const fullPath = path.join(postsDirectory, fileName)
-      const fileContents = fs.readFileSync(fullPath, 'utf8')
-      const { data, content } = matter(fileContents)
-
-      return {
-        slug,
-        title: data.title || slug,
-        date: data.date || new Date().toISOString(),
-        excerpt: data.excerpt || content.slice(0, 160) + '...',
-        image: data.image,
-        categories: data.categories || [],
-        content,
-        readingTime: calculateReadingTime(content),
-      }
-    })
-
-  return allPosts.sort((a, b) => (a.date < b.date ? 1 : -1))
 }
 
-export function getPostBySlug(slug: string): Post | null {
-  const fullPath = path.join(postsDirectory, `${slug}.md`)
+export async function getPostBySlug(slug: string): Promise<Post | null> {
+  try {
+    const posts = await sql`
+      SELECT
+        p.slug,
+        p.title,
+        p.excerpt,
+        p.content,
+        p.image,
+        p.published_at,
+        COALESCE(
+          (SELECT json_agg(c.name)
+           FROM categories c
+           JOIN post_categories pc ON pc.category_id = c.id
+           WHERE pc.post_id = p.id), '[]'
+        ) as categories
+      FROM posts p
+      WHERE p.slug = ${slug} AND p.published = true
+    `
 
-  if (!fs.existsSync(fullPath)) {
+    if (posts.length === 0) {
+      return null
+    }
+
+    const post = posts[0]
+
+    return {
+      slug: post.slug as string,
+      title: post.title as string,
+      date: post.published_at ? new Date(post.published_at as string).toISOString() : new Date().toISOString(),
+      excerpt: post.excerpt as string | undefined,
+      image: post.image as string | undefined,
+      categories: Array.isArray(post.categories) ? post.categories : [],
+      content: post.content as string,
+      readingTime: calculateReadingTime(post.content as string)
+    }
+  } catch (error) {
+    console.error('Error fetching post from database:', error)
     return null
-  }
-
-  const fileContents = fs.readFileSync(fullPath, 'utf8')
-  const { data, content } = matter(fileContents)
-
-  return {
-    slug,
-    title: data.title || slug,
-    date: data.date || new Date().toISOString(),
-    excerpt: data.excerpt,
-    image: data.image,
-    categories: data.categories || [],
-    content,
-    readingTime: calculateReadingTime(content),
   }
 }
 
@@ -81,13 +105,31 @@ export async function getPostContent(content: string): Promise<string> {
   return processedContent.toString()
 }
 
-export function getAllPostSlugs(): string[] {
-  if (!fs.existsSync(postsDirectory)) {
+export async function getAllPostSlugs(): Promise<string[]> {
+  try {
+    const posts = await sql`
+      SELECT slug FROM posts WHERE published = true
+    `
+    return posts.map(p => p.slug as string)
+  } catch (error) {
+    console.error('Error fetching post slugs from database:', error)
     return []
   }
+}
 
-  const fileNames = fs.readdirSync(postsDirectory)
-  return fileNames
-    .filter((name) => name.endsWith('.md'))
-    .map((name) => name.replace(/\.md$/, ''))
+export async function getAllCategories(): Promise<string[]> {
+  try {
+    const categories = await sql`
+      SELECT DISTINCT c.name
+      FROM categories c
+      JOIN post_categories pc ON pc.category_id = c.id
+      JOIN posts p ON p.id = pc.post_id
+      WHERE p.published = true
+      ORDER BY c.name
+    `
+    return categories.map(c => c.name as string)
+  } catch (error) {
+    console.error('Error fetching categories from database:', error)
+    return []
+  }
 }
