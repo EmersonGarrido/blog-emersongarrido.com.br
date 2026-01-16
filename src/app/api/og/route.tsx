@@ -3,10 +3,27 @@ import { NextRequest } from 'next/server'
 
 export const runtime = 'edge'
 
+function formatDate(dateString: string | null): string {
+  if (!dateString) return ''
+
+  const date = new Date(dateString)
+  const day = date.getDate()
+  const months = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez']
+  const month = months[date.getMonth()]
+  const year = date.getFullYear()
+  const hours = date.getHours().toString().padStart(2, '0')
+  const minutes = date.getMinutes().toString().padStart(2, '0')
+
+  return `${day} de ${month} de ${year} às ${hours}:${minutes}`
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const title = searchParams.get('title') || 'Emerson Garrido'
   const excerpt = searchParams.get('excerpt') || '30 anos. Documentando meu dia a dia, pensamentos e reflexões.'
+  const date = searchParams.get('date')
+
+  const avatarUrl = 'https://emersongarrido.com.br/avatar.jpg'
 
   return new ImageResponse(
     (
@@ -22,20 +39,15 @@ export async function GET(request: NextRequest) {
       >
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '40px' }}>
-          <div
+          <img
+            src={avatarUrl}
+            width={80}
+            height={80}
             style={{
-              width: '80px',
-              height: '80px',
               borderRadius: '50%',
-              backgroundColor: '#222',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
               marginRight: '20px',
             }}
-          >
-            <span style={{ fontSize: '40px', color: '#fff', fontWeight: 'bold' }}>E</span>
-          </div>
+          />
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontSize: '32px', color: '#fff', fontWeight: 'bold' }}>
               Emerson Garrido
@@ -55,9 +67,9 @@ export async function GET(request: NextRequest) {
         >
           <h1
             style={{
-              fontSize: '56px',
+              fontSize: '52px',
               color: '#fff',
-              fontWeight: 'bold',
+              fontWeight: 800,
               lineHeight: 1.2,
               marginBottom: '20px',
             }}
@@ -67,11 +79,11 @@ export async function GET(request: NextRequest) {
           <p
             style={{
               fontSize: '28px',
-              color: '#999',
+              color: '#a3a3a3',
               lineHeight: 1.5,
             }}
           >
-            {excerpt.length > 150 ? excerpt.slice(0, 150) + '...' : excerpt}
+            {excerpt.length > 120 ? excerpt.slice(0, 120) + '...' : excerpt}
           </p>
         </div>
 
@@ -85,7 +97,10 @@ export async function GET(request: NextRequest) {
             paddingTop: '30px',
           }}
         >
-          <span style={{ fontSize: '24px', color: '#666' }}>emersongarrido.com.br</span>
+          <span style={{ fontSize: '22px', color: '#666' }}>emersongarrido.com.br</span>
+          {date && (
+            <span style={{ fontSize: '22px', color: '#666' }}>{formatDate(date)}</span>
+          )}
         </div>
       </div>
     ),

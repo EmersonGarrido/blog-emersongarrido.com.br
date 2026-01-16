@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: 'Post não encontrado' }
   }
 
-  const ogImageUrl = `/api/og?title=${encodeURIComponent(post.title)}&excerpt=${encodeURIComponent(post.excerpt || '')}`
+  const ogImageUrl = `/api/og?title=${encodeURIComponent(post.title)}&excerpt=${encodeURIComponent(post.excerpt || '')}&date=${encodeURIComponent(post.date)}`
 
   return {
     title: post.title,
