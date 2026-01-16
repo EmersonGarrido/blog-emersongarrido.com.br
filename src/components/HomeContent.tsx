@@ -149,37 +149,51 @@ export default function HomeContent({ posts }: HomeContentProps) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.45 }}
-            className="mt-3 flex items-center gap-2 text-[var(--text-muted)] text-sm"
+            className="mt-3 flex items-center gap-1.5 text-[var(--text-muted)] text-sm"
           >
             <span>From</span>
             <div className="group relative">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/18px-Flag_of_Brazil.svg.png" alt="Brasil" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Brasil</span>
+              <div className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/18px-Flag_of_Brazil.svg.png" alt="Brasil" className="h-3 rounded-sm" />
+              </div>
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">Brasil</span>
             </div>
             <span className="text-[var(--text-muted)]">·</span>
             <div className="group relative">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Bandeira_de_Mato_Grosso_do_Sul.svg/18px-Bandeira_de_Mato_Grosso_do_Sul.svg.png" alt="MS" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Campo Grande, MS</span>
+              <div className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Bandeira_de_Mato_Grosso_do_Sul.svg/18px-Bandeira_de_Mato_Grosso_do_Sul.svg.png" alt="MS" className="h-3 rounded-sm" />
+              </div>
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">Campo Grande, MS</span>
             </div>
             <div className="group relative">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Bandeira_de_Mato_Grosso.svg/18px-Bandeira_de_Mato_Grosso.svg.png" alt="MT" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">São José do Rio Claro, MT</span>
+              <div className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Bandeira_de_Mato_Grosso.svg/18px-Bandeira_de_Mato_Grosso.svg.png" alt="MT" className="h-3 rounded-sm" />
+              </div>
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">São José do Rio Claro, MT</span>
             </div>
             <div className="group relative">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Bandeira_do_Amazonas.svg/18px-Bandeira_do_Amazonas.svg.png" alt="AM" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Manaus, AM</span>
+              <div className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Bandeira_do_Amazonas.svg/18px-Bandeira_do_Amazonas.svg.png" alt="AM" className="h-3 rounded-sm" />
+              </div>
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">Manaus, AM</span>
             </div>
             <div className="group relative">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Bandeira_do_estado_do_Rio_de_Janeiro.svg/18px-Bandeira_do_estado_do_Rio_de_Janeiro.svg.png" alt="RJ" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Rio de Janeiro, RJ</span>
+              <div className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Bandeira_do_estado_do_Rio_de_Janeiro.svg/18px-Bandeira_do_estado_do_Rio_de_Janeiro.svg.png" alt="RJ" className="h-3 rounded-sm" />
+              </div>
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">Rio de Janeiro, RJ</span>
             </div>
             <div className="group relative">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Bandeira_do_Distrito_Federal_%28Brasil%29.svg/18px-Bandeira_do_Distrito_Federal_%28Brasil%29.svg.png" alt="DF" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Brasília, DF</span>
+              <div className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Bandeira_do_Distrito_Federal_%28Brasil%29.svg/18px-Bandeira_do_Distrito_Federal_%28Brasil%29.svg.png" alt="DF" className="h-3 rounded-sm" />
+              </div>
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">Brasília, DF</span>
             </div>
             <div className="group relative">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Bandeira_do_estado_de_S%C3%A3o_Paulo.svg/18px-Bandeira_do_estado_de_S%C3%A3o_Paulo.svg.png" alt="SP" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Campinas, Igaratá e Capital, SP</span>
+              <div className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Bandeira_do_estado_de_S%C3%A3o_Paulo.svg/18px-Bandeira_do_estado_de_S%C3%A3o_Paulo.svg.png" alt="SP" className="h-3 rounded-sm" />
+              </div>
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">Campinas, Igaratá e Capital, SP</span>
             </div>
           </motion.div>
 

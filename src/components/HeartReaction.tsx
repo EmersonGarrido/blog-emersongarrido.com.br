@@ -14,6 +14,7 @@ export default function HeartReaction({ postSlug }: HeartReactionProps) {
 
   const [liked, setLiked] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [isAnimating, setIsAnimating] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -22,7 +23,6 @@ export default function HeartReaction({ postSlug }: HeartReactionProps) {
       setLiked(true)
     }
   }, [storageKey])
-  const [showBurst, setShowBurst] = useState(false)
 
   const handleClick = () => {
     const newLiked = !liked
@@ -30,8 +30,8 @@ export default function HeartReaction({ postSlug }: HeartReactionProps) {
     localStorage.setItem(storageKey, String(newLiked))
 
     if (newLiked) {
-      setShowBurst(true)
-      setTimeout(() => setShowBurst(false), 600)
+      setIsAnimating(true)
+      setTimeout(() => setIsAnimating(false), 800)
     }
   }
 
@@ -45,21 +45,47 @@ export default function HeartReaction({ postSlug }: HeartReactionProps) {
     )
   }
 
+  // Posições das partículas em círculo
+  const particles = [
+    { x: 0, y: -25 },
+    { x: 22, y: -12 },
+    { x: 22, y: 12 },
+    { x: 0, y: 25 },
+    { x: -22, y: 12 },
+    { x: -22, y: -12 },
+  ]
+
   return (
     <div className="relative">
       <motion.button
         onClick={handleClick}
-        className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--bg-tertiary)] hover:bg-[var(--bg-hover)] transition-colors group"
-        whileTap={{ scale: 0.9 }}
+        className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--bg-tertiary)] hover:bg-[var(--bg-hover)] transition-colors group relative overflow-visible"
+        whileTap={{ scale: 0.85 }}
         title={locale === 'en' ? 'Like' : 'Curtir'}
       >
+        {/* Círculo de pulso atrás */}
+        <AnimatePresence>
+          {isAnimating && (
+            <motion.div
+              className="absolute inset-0 rounded-full bg-red-500"
+              initial={{ scale: 1, opacity: 0.4 }}
+              animate={{ scale: 2, opacity: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Coração */}
         <motion.svg
-          className={`w-5 h-5 transition-colors ${liked ? 'text-red-500' : 'text-[var(--text-muted)] group-hover:text-red-400'}`}
+          className={`w-6 h-6 ${liked ? 'text-red-500' : 'text-[var(--text-muted)] group-hover:text-red-400'}`}
           fill={liked ? 'currentColor' : 'none'}
           stroke="currentColor"
           viewBox="0 0 24 24"
-          animate={liked ? { scale: [1, 1.3, 1] } : {}}
-          transition={{ duration: 0.3 }}
+          animate={isAnimating ? {
+            scale: [1, 1.4, 0.9, 1.2, 1],
+          } : {}}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
         >
           <path
             strokeLinecap="round"
@@ -70,24 +96,43 @@ export default function HeartReaction({ postSlug }: HeartReactionProps) {
         </motion.svg>
       </motion.button>
 
-      {/* Burst effect */}
+      {/* Partículas de explosão */}
       <AnimatePresence>
-        {showBurst && (
+        {isAnimating && (
           <>
-            {[...Array(6)].map((_, i) => (
+            {particles.map((pos, i) => (
               <motion.div
                 key={i}
-                className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full bg-red-500"
-                initial={{ scale: 0, x: '-50%', y: '-50%' }}
+                className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full bg-red-500 pointer-events-none"
+                style={{ marginLeft: -4, marginTop: -4 }}
+                initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
                 animate={{
-                  scale: [0, 1, 0],
-                  x: `${Math.cos((i * 60 * Math.PI) / 180) * 30 - 50}%`,
-                  y: `${Math.sin((i * 60 * Math.PI) / 180) * 30 - 50}%`,
+                  x: pos.x,
+                  y: pos.y,
+                  scale: [0, 1.5, 0],
                   opacity: [1, 1, 0],
                 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
+                transition={{ duration: 0.6, ease: 'easeOut', delay: i * 0.02 }}
               />
+            ))}
+            {/* Mini corações */}
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={`heart-${i}`}
+                className="absolute top-1/2 left-1/2 text-red-500 pointer-events-none text-xs"
+                style={{ marginLeft: -6, marginTop: -6 }}
+                initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
+                animate={{
+                  x: [0, (i - 1) * 30],
+                  y: [0, -35 - i * 5],
+                  scale: [0, 1, 0.5],
+                  opacity: [1, 1, 0],
+                  rotate: [0, (i - 1) * 20],
+                }}
+                transition={{ duration: 0.7, ease: 'easeOut', delay: 0.1 }}
+              >
+                ❤️
+              </motion.div>
             ))}
           </>
         )}
