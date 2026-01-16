@@ -14,11 +14,18 @@ interface PostCardProps {
 
 export default function PostCard({ post, index }: PostCardProps) {
   const { t, locale } = useLocale()
+  const [viewsCount, setViewsCount] = useState(0)
   const [likesCount, setLikesCount] = useState(0)
   const [commentsCount, setCommentsCount] = useState(0)
   const [isLiked, setIsLiked] = useState(false)
 
   useEffect(() => {
+    // Fetch views
+    fetch(`/api/views?slug=${encodeURIComponent(post.slug)}`)
+      .then(res => res.json())
+      .then(data => setViewsCount(data.views || 0))
+      .catch(() => {})
+
     // Fetch likes
     fetch(`/api/likes?slug=${encodeURIComponent(post.slug)}`)
       .then(res => res.json())
@@ -31,9 +38,7 @@ export default function PostCard({ post, index }: PostCardProps) {
     // Fetch comments count
     fetch(`/api/comments?slug=${encodeURIComponent(post.slug)}`)
       .then(res => res.json())
-      .then(data => {
-        setCommentsCount(data.comments?.length || 0)
-      })
+      .then(data => setCommentsCount(data.comments?.length || 0))
       .catch(() => {})
   }, [post.slug])
 
@@ -94,13 +99,17 @@ export default function PostCard({ post, index }: PostCardProps) {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <Link href="/" className="font-semibold text-[15px] hover:underline">emersongarrido</Link>
+            {/* Verified badge */}
+            <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+              <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.2" />
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+            </svg>
+            <span className="text-[var(--text-muted)] text-[15px]">·</span>
             <span className="text-[var(--text-secondary)] text-[15px]">
               {formatDate(post.date)}
-              {post.readingTime && (
-                <span> · {post.readingTime} min</span>
-              )}
             </span>
           </div>
 
@@ -125,66 +134,81 @@ export default function PostCard({ post, index }: PostCardProps) {
                   {post.excerpt}
                 </p>
                 {post.categories && post.categories.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {post.categories.map((category) => (
-                      <span
-                        key={category}
-                        className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
-                      >
-                        #{category.replace(/\s+/g, '')}
+                  <p className="mt-2">
+                    {post.categories.map((category, i) => (
+                      <span key={category}>
+                        <span className="text-sm text-teal-400 hover:text-teal-300 transition-colors">
+                          #{category.replace(/\s+/g, '')}
+                        </span>
+                        {i < post.categories!.length - 1 && ' '}
                       </span>
                     ))}
-                  </div>
+                  </p>
                 )}
-
-                {/* Actions: Like & Comments */}
-                <div className="mt-3 flex items-center gap-4">
-                  <button
-                    onClick={handleLike}
-                    className={`flex items-center gap-1.5 text-sm transition-colors ${
-                      isLiked ? 'text-red-500' : 'text-[var(--text-muted)] hover:text-red-500'
-                    }`}
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      fill={isLiked ? 'currentColor' : 'none'}
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                      />
-                    </svg>
-                    {likesCount > 0 && <span>{likesCount}</span>}
-                  </button>
-
-                  <span className="flex items-center gap-1.5 text-sm text-[var(--text-muted)]">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                      />
-                    </svg>
-                    {commentsCount > 0 && <span>{commentsCount}</span>}
-                  </span>
-
-                  <span className="flex-1" />
-
-                  <span className="flex items-center gap-1 text-[var(--text-secondary)] text-sm">
-                    {t.readMore}
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </span>
-                </div>
               </div>
             </motion.div>
           </Link>
+
+          {/* Stats bar - outside the card */}
+          <div className="mt-2 flex items-center gap-4 px-1">
+            {/* Views */}
+            <span className="flex items-center gap-1.5 text-sm text-[var(--text-muted)]">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <span>{viewsCount}</span>
+            </span>
+
+            {/* Likes */}
+            <button
+              onClick={handleLike}
+              className={`flex items-center gap-1.5 text-sm transition-colors ${
+                isLiked ? 'text-red-500' : 'text-[var(--text-muted)] hover:text-red-500'
+              }`}
+            >
+              <svg
+                className="w-4 h-4"
+                fill={isLiked ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
+              </svg>
+              <span>{likesCount}</span>
+            </button>
+
+            {/* Comments */}
+            <span className="flex items-center gap-1.5 text-sm text-[var(--text-muted)]">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
+              </svg>
+              <span>{commentsCount}</span>
+            </span>
+
+            <span className="flex-1" />
+
+            {/* Read more */}
+            <Link
+              href={`/post/${post.slug}`}
+              className="flex items-center gap-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm transition-colors"
+            >
+              {t.readMore}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
         </div>
       </div>
     </motion.article>
