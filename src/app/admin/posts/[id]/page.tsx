@@ -4,9 +4,7 @@ import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import dynamic from 'next/dynamic'
-
-const RichEditor = dynamic(() => import('@/components/RichEditor'), { ssr: false })
+import RichEditor from '@/components/RichEditor'
 
 interface Category {
   id: number
