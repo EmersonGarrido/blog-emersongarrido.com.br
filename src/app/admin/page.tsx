@@ -140,18 +140,8 @@ export default function AdminLoginPage() {
       >
         {/* Glass card */}
         <div className="relative">
-          {/* Glow effect */}
-          <motion.div
-            className="absolute -inset-1 rounded-3xl opacity-50 blur-xl"
-            style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899)' }}
-            animate={{
-              opacity: focused ? 0.6 : 0.3,
-            }}
-            transition={{ duration: 0.3 }}
-          />
-
           {/* Card content */}
-          <div className="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 shadow-2xl">
+          <div className="relative bg-neutral-900/90 backdrop-blur-2xl border border-white/10 rounded-2xl p-8 shadow-2xl">
             {/* Avatar */}
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
@@ -170,11 +160,9 @@ export default function AdminLoginPage() {
                   />
                 </div>
                 <motion.div
-                  className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center"
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
+                  className="absolute -bottom-1 -right-1 w-6 h-6 bg-neutral-700 border border-white/10 rounded-full flex items-center justify-center"
                 >
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-3 h-3 text-white/60" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                   </svg>
                 </motion.div>
@@ -202,7 +190,7 @@ export default function AdminLoginPage() {
                 <div className="relative group">
                   <div className={`absolute inset-0 rounded-xl transition-all duration-300 ${
                     focused
-                      ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-sm'
+                      ? 'bg-white/5 blur-sm'
                       : 'bg-transparent'
                   }`} />
                   <div className="relative flex items-center">
@@ -248,16 +236,13 @@ export default function AdminLoginPage() {
                 <button
                   type="submit"
                   disabled={loading || !password}
-                  className="relative w-full group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl blur opacity-70 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative flex items-center justify-center gap-2 py-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl text-white font-medium transition-all hover:shadow-lg hover:shadow-purple-500/25 disabled:opacity-50 disabled:cursor-not-allowed">
+                  className="w-full flex items-center justify-center gap-2 py-4 bg-white text-black font-medium rounded-xl transition-all hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed">
                     {loading ? (
                       <>
                         <motion.div
                           animate={{ rotate: 360 }}
                           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                          className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                          className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full"
                         />
                         <span>Entrando...</span>
                       </>
@@ -269,7 +254,6 @@ export default function AdminLoginPage() {
                         </svg>
                       </>
                     )}
-                  </div>
                 </button>
               </motion.div>
             </form>

@@ -13,7 +13,9 @@ export async function GET(request: NextRequest) {
 
   try {
     let dateFilter = ''
-    if (period === '7d') {
+    if (period === 'today') {
+      dateFilter = `AND created_at > NOW() - INTERVAL '1 day'`
+    } else if (period === '7d') {
       dateFilter = `AND created_at > NOW() - INTERVAL '7 days'`
     } else if (period === '30d') {
       dateFilter = `AND created_at > NOW() - INTERVAL '30 days'`

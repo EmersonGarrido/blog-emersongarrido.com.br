@@ -205,7 +205,7 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab('analytics')}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
               activeTab === 'analytics'
-                ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-purple-500/20'
+                ? 'bg-white text-black'
                 : 'bg-white/5 text-white/60 hover:bg-white/10'
             }`}
           >
@@ -215,7 +215,7 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab('comments')}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 ${
               activeTab === 'comments'
-                ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-purple-500/20'
+                ? 'bg-white text-black'
                 : 'bg-white/5 text-white/60 hover:bg-white/10'
             }`}
           >
@@ -236,7 +236,7 @@ export default function AdminDashboard() {
           >
             {/* Period Filter */}
             <div className="flex gap-2">
-              {['7d', '30d', 'all'].map((p) => (
+              {['today', '7d', '30d', 'all'].map((p) => (
                 <button
                   key={p}
                   onClick={() => setPeriod(p)}
@@ -246,7 +246,7 @@ export default function AdminDashboard() {
                       : 'text-white/40 hover:text-white/60'
                   }`}
                 >
-                  {p === '7d' ? '7 dias' : p === '30d' ? '30 dias' : 'Tudo'}
+                  {p === 'today' ? 'Hoje' : p === '7d' ? '7 dias' : p === '30d' ? '30 dias' : 'Tudo'}
                 </button>
               ))}
             </div>
