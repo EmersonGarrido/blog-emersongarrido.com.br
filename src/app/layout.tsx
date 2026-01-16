@@ -8,14 +8,16 @@ const inter = Inter({
   display: 'swap',
 })
 
+const siteDescription = 'Cansei de pedir ajuda pra pessoas próximas, resolvi relatar publicamente o que ando passando. Não tá fácil, mas sigo tentando.'
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://emersongarrido.com.br'),
   title: {
     default: 'Emerson Garrido',
     template: '%s | Emerson Garrido',
   },
-  description: '30 anos. Documentando meu dia a dia, pensamentos e reflexões.',
-  keywords: ['Emerson Garrido', 'blog', 'pessoal', 'reflexões', 'dia a dia'],
+  description: siteDescription,
+  keywords: ['Emerson Garrido', 'blog', 'pessoal', 'saúde mental', 'burnout', 'depressão'],
   authors: [{ name: 'Emerson Garrido' }],
   creator: 'Emerson Garrido',
   icons: {
@@ -30,10 +32,10 @@ export const metadata: Metadata = {
     url: 'https://emersongarrido.com.br',
     siteName: 'Emerson Garrido',
     title: 'Emerson Garrido',
-    description: '30 anos. Documentando meu dia a dia, pensamentos e reflexões.',
+    description: siteDescription,
     images: [
       {
-        url: '/api/og?title=Emerson%20Garrido&excerpt=30%20anos.%20Documentando%20meu%20dia%20a%20dia%2C%20pensamentos%20e%20reflex%C3%B5es.',
+        url: `/api/og?title=${encodeURIComponent('Emerson Garrido')}&excerpt=${encodeURIComponent(siteDescription)}`,
         width: 1200,
         height: 630,
         alt: 'Emerson Garrido',
@@ -43,8 +45,8 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Emerson Garrido',
-    description: '30 anos. Documentando meu dia a dia, pensamentos e reflexões.',
-    images: ['/api/og?title=Emerson%20Garrido&excerpt=30%20anos.%20Documentando%20meu%20dia%20a%20dia%2C%20pensamentos%20e%20reflex%C3%B5es.'],
+    description: siteDescription,
+    images: [`/api/og?title=${encodeURIComponent('Emerson Garrido')}&excerpt=${encodeURIComponent(siteDescription)}`],
     creator: '@emersongarrido',
   },
   robots: {

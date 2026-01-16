@@ -3,7 +3,7 @@ export type Locale = 'pt-BR' | 'en'
 export const translations = {
   'pt-BR': {
     age: '30 anos',
-    bio: 'Documentando meu dia a dia, pensamentos e reflexões.',
+    bio: 'Cansei de pedir ajuda pra pessoas próximas, resolvi relatar publicamente o que ando passando. Não tá fácil, mas sigo tentando.',
     writtenBy: 'Escrito por',
     relatedPosts: 'Outros posts',
     loading: 'Carregando...',
@@ -18,7 +18,7 @@ export const translations = {
   },
   'en': {
     age: '30 years old',
-    bio: 'Documenting my daily life, thoughts and reflections.',
+    bio: "Tired of asking for help from people close to me, I decided to publicly share what I'm going through. It's not easy, but I keep trying.",
     writtenBy: 'Written by',
     relatedPosts: 'Other posts',
     loading: 'Loading...',

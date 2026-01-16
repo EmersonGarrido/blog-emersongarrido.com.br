@@ -20,7 +20,7 @@ function formatDate(dateString: string | null): string {
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const title = searchParams.get('title') || 'Emerson Garrido'
-  const excerpt = searchParams.get('excerpt') || '30 anos. Documentando meu dia a dia, pensamentos e reflexões.'
+  const excerpt = searchParams.get('excerpt') || 'Cansei de pedir ajuda pra pessoas próximas, resolvi relatar publicamente o que ando passando. Não tá fácil, mas sigo tentando.'
   const date = searchParams.get('date')
 
   const avatarUrl = 'https://emersongarrido.com.br/avatar.jpg'
