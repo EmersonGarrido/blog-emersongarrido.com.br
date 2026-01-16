@@ -318,22 +318,22 @@ function htmlToMarkdown(html: string): string {
   text = text.replace(/<img[^>]*src="([^"]*)"[^>]*>/gi, '![]($1)')
 
   // Lists
-  text = text.replace(/<ul[^>]*>(.*?)<\/ul>/gis, (match, content) => {
+  text = text.replace(/<ul[^>]*>([\s\S]*?)<\/ul>/gi, (match, content) => {
     return content.replace(/<li[^>]*>(.*?)<\/li>/gi, '- $1\n') + '\n'
   })
-  text = text.replace(/<ol[^>]*>(.*?)<\/ol>/gis, (match, content) => {
+  text = text.replace(/<ol[^>]*>([\s\S]*?)<\/ol>/gi, (match, content) => {
     let index = 1
     return content.replace(/<li[^>]*>(.*?)<\/li>/gi, () => `${index++}. ` + '$1\n') + '\n'
   })
 
   // Blockquotes
-  text = text.replace(/<blockquote[^>]*>(.*?)<\/blockquote>/gis, (match, content) => {
+  text = text.replace(/<blockquote[^>]*>(.*?)<\/blockquote>/gi, (match, content) => {
     const cleaned = content.replace(/<p[^>]*>(.*?)<\/p>/gi, '$1')
     return '> ' + cleaned.trim() + '\n\n'
   })
 
   // Code blocks
-  text = text.replace(/<pre[^>]*><code[^>]*>(.*?)<\/code><\/pre>/gis, '```\n$1\n```\n\n')
+  text = text.replace(/<pre[^>]*><code[^>]*>(.*?)<\/code><\/pre>/gi, '```\n$1\n```\n\n')
   text = text.replace(/<code[^>]*>(.*?)<\/code>/gi, '`$1`')
 
   // Paragraphs
