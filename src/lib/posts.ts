@@ -133,4 +133,3 @@ export async function getAllCategories(): Promise<string[]> {
     return []
   }
 }
-// Trigger redeploy sex 16 jan 2026 09:48:05 -04

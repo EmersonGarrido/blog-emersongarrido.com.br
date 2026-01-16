@@ -77,7 +77,7 @@ export async function POST() {
 
     // Insert categories
     let categoriesCreated = 0
-    for (const catName of categories) {
+    for (const catName of Array.from(categories)) {
       const catSlug = slugify(catName)
       const existing = await sql`SELECT id FROM categories WHERE slug = ${catSlug}`
       if (existing.length === 0) {
