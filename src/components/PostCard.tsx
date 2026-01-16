@@ -130,7 +130,7 @@ export default function PostCard({ post, index }: PostCardProps) {
                 </div>
               )}
               <div className="p-4">
-                <p className="text-[15px] text-[var(--text-secondary)] leading-relaxed">
+                <p className="text-[15px] text-[var(--text-secondary)] leading-relaxed line-clamp-4">
                   {post.excerpt}
                 </p>
                 {post.categories && post.categories.length > 0 && (
@@ -196,18 +196,6 @@ export default function PostCard({ post, index }: PostCardProps) {
               <span>{commentsCount}</span>
             </span>
 
-            <span className="flex-1" />
-
-            {/* Read more */}
-            <Link
-              href={`/post/${post.slug}`}
-              className="flex items-center gap-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm transition-colors"
-            >
-              {t.readMore}
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
           </div>
         </div>
       </div>
