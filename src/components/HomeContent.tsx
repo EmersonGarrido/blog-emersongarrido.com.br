@@ -8,7 +8,7 @@ import PostCard from '@/components/PostCard'
 import { PostSkeletonList } from '@/components/PostSkeleton'
 import ThemeToggle from '@/components/ThemeToggle'
 import Analytics from '@/components/Analytics'
-import NewsletterForm from '@/components/NewsletterForm'
+import NewsletterModal from '@/components/NewsletterModal'
 import { useLocale } from '@/contexts/LocaleContext'
 import type { Post } from '@/lib/posts'
 
@@ -26,6 +26,7 @@ export default function HomeContent({ posts }: HomeContentProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [showFilters, setShowFilters] = useState(false)
+  const [showNewsletter, setShowNewsletter] = useState(false)
   const loaderRef = useRef<HTMLDivElement>(null)
 
   // Extrair categorias únicas
@@ -339,6 +340,17 @@ export default function HomeContent({ posts }: HomeContentProps) {
               </svg>
               RSS
             </a>
+
+            <button
+              onClick={() => setShowNewsletter(true)}
+              className="text-[var(--text-secondary)] hover:text-blue-500 text-[15px] transition-colors flex items-center gap-1"
+              title="Newsletter"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              Newsletter
+            </button>
           </motion.div>
         </motion.div>
 
@@ -349,14 +361,6 @@ export default function HomeContent({ posts }: HomeContentProps) {
           transition={{ duration: 0.5, delay: 0.6 }}
           className="border-t border-[var(--border-color)] origin-left"
         />
-
-        {/* Newsletter */}
-        <div className="px-4 py-6">
-          <NewsletterForm />
-        </div>
-
-        {/* Divider */}
-        <div className="border-t border-[var(--border-color)]" />
 
         {/* Feed */}
         <div className="py-2">
@@ -389,6 +393,9 @@ export default function HomeContent({ posts }: HomeContentProps) {
           </div>
         </div>
       </main>
+
+      {/* Newsletter Modal */}
+      <NewsletterModal isOpen={showNewsletter} onClose={() => setShowNewsletter(false)} />
     </div>
   )
 }
