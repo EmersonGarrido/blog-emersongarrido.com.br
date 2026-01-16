@@ -21,6 +21,8 @@ interface Post {
   published_at: string | null
   created_at: string
   categories: Category[]
+  likes_count: number
+  comments_count: number
 }
 
 export default function AdminPostsPage() {
@@ -220,6 +222,8 @@ export default function AdminPostsPage() {
                 <tr className="border-b border-white/10 text-left text-white/40 text-sm">
                   <th className="px-4 py-3 font-medium">Título</th>
                   <th className="px-4 py-3 font-medium hidden md:table-cell">Categorias</th>
+                  <th className="px-4 py-3 font-medium hidden lg:table-cell text-center">Likes</th>
+                  <th className="px-4 py-3 font-medium hidden lg:table-cell text-center">Coment.</th>
                   <th className="px-4 py-3 font-medium hidden sm:table-cell">Data</th>
                   <th className="px-4 py-3 font-medium">Status</th>
                   <th className="px-4 py-3 font-medium text-right">Ações</th>
@@ -251,6 +255,30 @@ export default function AdminPostsPage() {
                             </span>
                           ))}
                         </div>
+                      </td>
+                      <td className="px-4 py-3 hidden lg:table-cell text-center">
+                        {post.likes_count > 0 ? (
+                          <span className="text-red-400 text-sm flex items-center justify-center gap-1">
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                            </svg>
+                            {post.likes_count}
+                          </span>
+                        ) : (
+                          <span className="text-white/20 text-sm">-</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 hidden lg:table-cell text-center">
+                        {post.comments_count > 0 ? (
+                          <span className="text-cyan-400 text-sm flex items-center justify-center gap-1">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            {post.comments_count}
+                          </span>
+                        ) : (
+                          <span className="text-white/20 text-sm">-</span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-white/40 text-sm hidden sm:table-cell">
                         {formatDate(post.published_at || post.created_at)}

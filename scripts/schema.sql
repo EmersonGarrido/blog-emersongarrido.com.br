@@ -53,3 +53,16 @@ CREATE TABLE IF NOT EXISTS page_views (
 CREATE INDEX IF NOT EXISTS idx_page_views_post_slug ON page_views(post_slug);
 CREATE INDEX IF NOT EXISTS idx_page_views_created_at ON page_views(created_at);
 CREATE INDEX IF NOT EXISTS idx_page_views_utm_source ON page_views(utm_source);
+
+-- Tabela de Subscribers (Newsletter)
+CREATE TABLE IF NOT EXISTS subscribers (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  name VARCHAR(100),
+  status VARCHAR(20) DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Index para subscribers
+CREATE INDEX IF NOT EXISTS idx_subscribers_email ON subscribers(email);
+CREATE INDEX IF NOT EXISTS idx_subscribers_status ON subscribers(status);

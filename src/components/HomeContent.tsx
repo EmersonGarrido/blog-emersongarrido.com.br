@@ -8,6 +8,7 @@ import PostCard from '@/components/PostCard'
 import { PostSkeletonList } from '@/components/PostSkeleton'
 import ThemeToggle from '@/components/ThemeToggle'
 import Analytics from '@/components/Analytics'
+import NewsletterForm from '@/components/NewsletterForm'
 import { useLocale } from '@/contexts/LocaleContext'
 import type { Post } from '@/lib/posts'
 
@@ -348,6 +349,14 @@ export default function HomeContent({ posts }: HomeContentProps) {
           transition={{ duration: 0.5, delay: 0.6 }}
           className="border-t border-[var(--border-color)] origin-left"
         />
+
+        {/* Newsletter */}
+        <div className="px-4 py-6">
+          <NewsletterForm />
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-[var(--border-color)]" />
 
         {/* Feed */}
         <div className="py-2">

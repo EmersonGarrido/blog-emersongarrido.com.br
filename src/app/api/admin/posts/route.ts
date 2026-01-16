@@ -31,7 +31,9 @@ export async function GET(request: NextRequest) {
              FROM categories c
              JOIN post_categories pc ON pc.category_id = c.id
              WHERE pc.post_id = p.id), '[]'
-          ) as categories
+          ) as categories,
+          (SELECT COUNT(*) FROM likes l WHERE l.post_slug = p.slug)::int as likes_count,
+          (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
         FROM posts p
         WHERE p.published = true
         ORDER BY p.published_at DESC
@@ -44,7 +46,9 @@ export async function GET(request: NextRequest) {
              FROM categories c
              JOIN post_categories pc ON pc.category_id = c.id
              WHERE pc.post_id = p.id), '[]'
-          ) as categories
+          ) as categories,
+          (SELECT COUNT(*) FROM likes l WHERE l.post_slug = p.slug)::int as likes_count,
+          (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
         FROM posts p
         WHERE p.published = false
         ORDER BY p.created_at DESC
@@ -57,7 +61,9 @@ export async function GET(request: NextRequest) {
              FROM categories c
              JOIN post_categories pc ON pc.category_id = c.id
              WHERE pc.post_id = p.id), '[]'
-          ) as categories
+          ) as categories,
+          (SELECT COUNT(*) FROM likes l WHERE l.post_slug = p.slug)::int as likes_count,
+          (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
         FROM posts p
         ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
       `

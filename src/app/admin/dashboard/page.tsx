@@ -61,19 +61,23 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'analytics' | 'comments'>('analytics')
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
+  const [totalSubscribers, setTotalSubscribers] = useState(0)
 
   const loadData = useCallback(async () => {
     try {
-      const [analyticsRes, commentsRes] = await Promise.all([
+      const [analyticsRes, commentsRes, subscribersRes] = await Promise.all([
         fetch(`/api/admin/analytics?period=${period}`),
-        fetch(`/api/admin/comments?status=${commentFilter}`)
+        fetch(`/api/admin/comments?status=${commentFilter}`),
+        fetch('/api/admin/subscribers?status=active')
       ])
 
       const analyticsData = await analyticsRes.json()
       const commentsData = await commentsRes.json()
+      const subscribersData = await subscribersRes.json()
 
       setAnalytics(analyticsData)
       setComments(commentsData.comments || [])
+      setTotalSubscribers(subscribersData.total || 0)
       setLastUpdate(new Date())
     } catch (error) {
       console.error('Load data error:', error)
@@ -244,6 +248,20 @@ export default function AdminDashboard() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" />
             </svg>
             Categorias
+          </Link>
+          <Link
+            href="/admin/subscribers"
+            className="px-4 py-2 rounded-xl text-sm font-medium transition-all bg-white/5 text-white/60 hover:bg-white/10 flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            Inscritos
+            {totalSubscribers > 0 && (
+              <span className="bg-green-500/20 text-green-400 text-xs px-1.5 py-0.5 rounded-full">
+                {totalSubscribers}
+              </span>
+            )}
           </Link>
         </div>
 
