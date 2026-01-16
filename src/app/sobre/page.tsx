@@ -74,7 +74,7 @@ export default function SobrePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
-          className="space-y-5 text-neutral-300 text-[16px] leading-relaxed"
+          className="space-y-5 text-neutral-300 text-[18px] leading-relaxed font-serif"
         >
           <p>
             Tenho 30 anos, faço 31 em 2026. Nasci em Campo Grande, MS, e hoje trabalho como programador e desenvolvedor de sistemas.
