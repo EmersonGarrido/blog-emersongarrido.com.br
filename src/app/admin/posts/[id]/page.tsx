@@ -244,20 +244,34 @@ export default function EditPostPage() {
               </div>
             </div>
 
-            {/* Publish */}
+            {/* Publish Toggle */}
             <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={published}
-                  onChange={(e) => setPublished(e.target.checked)}
-                  className="w-5 h-5 rounded bg-white/10 border-white/20 text-white focus:ring-0 focus:ring-offset-0"
-                />
+              <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-sm font-medium">Publicado</span>
-                  <p className="text-xs text-white/40 mt-0.5">Desmarque para salvar como rascunho</p>
+                  <span className="text-sm font-medium">Status</span>
+                  <p className="text-xs text-white/40 mt-0.5">
+                    {published ? 'Visível para todos' : 'Apenas você pode ver'}
+                  </p>
                 </div>
-              </label>
+                <button
+                  type="button"
+                  onClick={() => setPublished(!published)}
+                  className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors ${
+                    published ? 'bg-green-500' : 'bg-white/20'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform ${
+                      published ? 'translate-x-9' : 'translate-x-1'
+                    }`}
+                  />
+                  <span className={`absolute text-[10px] font-medium ${
+                    published ? 'left-2 text-white' : 'right-2 text-white/60'
+                  }`}>
+                    {published ? 'ON' : 'OFF'}
+                  </span>
+                </button>
+              </div>
             </div>
           </form>
         )}
