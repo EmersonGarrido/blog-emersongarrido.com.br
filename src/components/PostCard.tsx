@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { useLocale } from '@/contexts/LocaleContext'
+import ShareModal from '@/components/ShareModal'
 import type { Post } from '@/lib/posts'
 
 interface PostCardProps {
@@ -13,12 +14,13 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post, index }: PostCardProps) {
-  const { t, locale } = useLocale()
+  const { locale } = useLocale()
   const [viewsCount, setViewsCount] = useState(0)
   const [likesCount, setLikesCount] = useState(0)
   const [commentsCount, setCommentsCount] = useState(0)
   const [sharesCount, setSharesCount] = useState(0)
   const [isLiked, setIsLiked] = useState(false)
+  const [showShareModal, setShowShareModal] = useState(false)
 
   useEffect(() => {
     // Fetch views
@@ -72,29 +74,14 @@ export default function PostCard({ post, index }: PostCardProps) {
     } catch {}
   }
 
-  const handleShare = async (e: React.MouseEvent) => {
+  const handleShareClick = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    setShowShareModal(true)
+  }
 
-    const shareUrl = `${window.location.origin}/post/${post.slug}?utm_source=share&utm_medium=post`
-    const shareData = {
-      title: post.title || post.excerpt?.slice(0, 50) || 'Post',
-      text: post.excerpt?.slice(0, 100) || '',
-      url: shareUrl
-    }
-
-    let method = 'copy'
-
+  const handleShareComplete = async (method: string) => {
     try {
-      if (navigator.share) {
-        await navigator.share(shareData)
-        method = 'native'
-      } else {
-        await navigator.clipboard.writeText(shareUrl)
-        alert(locale === 'en' ? 'Link copied!' : 'Link copiado!')
-      }
-
-      // Track the share
       const res = await fetch('/api/shares', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -102,13 +89,15 @@ export default function PostCard({ post, index }: PostCardProps) {
       })
       const data = await res.json()
       setSharesCount(data.shares || sharesCount + 1)
+      setShowShareModal(false)
     } catch (error) {
-      // User cancelled share or error
-      if ((error as Error).name !== 'AbortError') {
-        console.error('Share error:', error)
-      }
+      console.error('Share tracking error:', error)
     }
   }
+
+  const shareUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/post/${post.slug}?utm_source=share&utm_medium=post`
+    : `https://emersongarrido.com.br/post/${post.slug}?utm_source=share&utm_medium=post`
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString)
@@ -181,7 +170,7 @@ export default function PostCard({ post, index }: PostCardProps) {
                     <p className="mt-2">
                       {post.categories.map((category, i) => (
                         <span key={category}>
-                          <span className="text-sm text-teal-400 hover:text-teal-300 transition-colors">
+                          <span className="text-sm transition-colors" style={{ color: 'var(--accent-color)' }}>
                             #{category.replace(/\s+/g, '')}
                           </span>
                           {i < post.categories!.length - 1 && ' '}
@@ -252,7 +241,7 @@ export default function PostCard({ post, index }: PostCardProps) {
 
             {/* Share */}
             <button
-              onClick={handleShare}
+              onClick={handleShareClick}
               className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-green-400 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -269,6 +258,15 @@ export default function PostCard({ post, index }: PostCardProps) {
           </div>
         </div>
       </div>
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        url={shareUrl}
+        title={post.title || post.excerpt?.slice(0, 50) || 'Post'}
+        onShare={handleShareComplete}
+      />
     </motion.article>
   )
 }

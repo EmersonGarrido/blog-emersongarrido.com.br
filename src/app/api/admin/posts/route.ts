@@ -11,7 +11,7 @@ function slugify(text: string): string {
     .replace(/(^-|-$)+/g, '')
 }
 
-// Get all posts
+// Get all posts with search, filter, and pagination
 export async function GET(request: NextRequest) {
   const authenticated = await isAuthenticated()
   if (!authenticated) {
@@ -19,60 +19,98 @@ export async function GET(request: NextRequest) {
   }
 
   const { searchParams } = new URL(request.url)
-  const status = searchParams.get('status') // all, published, draft
+  const status = searchParams.get('status') || 'all'
+  const search = searchParams.get('search') || ''
+  const categoryId = searchParams.get('category')
+  const page = parseInt(searchParams.get('page') || '1')
+  const limit = parseInt(searchParams.get('limit') || '10')
+  const offset = (page - 1) * limit
 
   try {
-    let posts
+    // Build WHERE conditions
+    const conditions: string[] = []
+
     if (status === 'published') {
-      posts = await sql`
-        SELECT p.*,
-          COALESCE(
-            (SELECT json_agg(json_build_object('id', c.id, 'name', c.name, 'slug', c.slug))
-             FROM categories c
-             JOIN post_categories pc ON pc.category_id = c.id
-             WHERE pc.post_id = p.id), '[]'
-          ) as categories,
-          (SELECT COUNT(*) FROM page_views pv WHERE pv.post_slug = p.slug)::int as views_count,
-          (SELECT COUNT(*) FROM likes l WHERE l.post_slug = p.slug)::int as likes_count,
-          (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
-        FROM posts p
-        WHERE p.published = true
-        ORDER BY p.published_at DESC
-      `
+      conditions.push('p.published = true')
     } else if (status === 'draft') {
-      posts = await sql`
-        SELECT p.*,
-          COALESCE(
-            (SELECT json_agg(json_build_object('id', c.id, 'name', c.name, 'slug', c.slug))
-             FROM categories c
-             JOIN post_categories pc ON pc.category_id = c.id
-             WHERE pc.post_id = p.id), '[]'
-          ) as categories,
-          (SELECT COUNT(*) FROM page_views pv WHERE pv.post_slug = p.slug)::int as views_count,
-          (SELECT COUNT(*) FROM likes l WHERE l.post_slug = p.slug)::int as likes_count,
-          (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
-        FROM posts p
-        WHERE p.published = false
-        ORDER BY p.created_at DESC
+      conditions.push('p.published = false')
+    }
+
+    if (search) {
+      conditions.push(`(p.title ILIKE '%' || $search || '%' OR p.excerpt ILIKE '%' || $search || '%')`)
+    }
+
+    if (categoryId) {
+      conditions.push(`EXISTS (SELECT 1 FROM post_categories pc2 WHERE pc2.post_id = p.id AND pc2.category_id = $categoryId)`)
+    }
+
+    const whereClause = conditions.length > 0 ? conditions.join(' AND ') : '1=1'
+
+    // Get total count for pagination
+    let totalResult
+    if (search && categoryId) {
+      totalResult = await sql`
+        SELECT COUNT(*) as total FROM posts p
+        WHERE ${sql.unsafe(whereClause.replace('$search', `'${search.replace(/'/g, "''")}'`).replace('$categoryId', categoryId))}
+      `
+    } else if (search) {
+      totalResult = await sql`
+        SELECT COUNT(*) as total FROM posts p
+        WHERE ${sql.unsafe(whereClause.replace('$search', `'${search.replace(/'/g, "''")}'`))}
+      `
+    } else if (categoryId) {
+      totalResult = await sql`
+        SELECT COUNT(*) as total FROM posts p
+        WHERE ${sql.unsafe(whereClause.replace('$categoryId', categoryId))}
       `
     } else {
-      posts = await sql`
-        SELECT p.*,
-          COALESCE(
-            (SELECT json_agg(json_build_object('id', c.id, 'name', c.name, 'slug', c.slug))
-             FROM categories c
-             JOIN post_categories pc ON pc.category_id = c.id
-             WHERE pc.post_id = p.id), '[]'
-          ) as categories,
-          (SELECT COUNT(*) FROM page_views pv WHERE pv.post_slug = p.slug)::int as views_count,
-          (SELECT COUNT(*) FROM likes l WHERE l.post_slug = p.slug)::int as likes_count,
-          (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
-        FROM posts p
-        ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
+      totalResult = await sql`
+        SELECT COUNT(*) as total FROM posts p
+        WHERE ${sql.unsafe(whereClause)}
       `
     }
 
-    return NextResponse.json({ posts })
+    const total = parseInt(totalResult[0].total as string)
+    const totalPages = Math.ceil(total / limit)
+
+    // Get posts with pagination
+    let posts
+    const baseQuery = `
+      SELECT p.*,
+        COALESCE(
+          (SELECT json_agg(json_build_object('id', c.id, 'name', c.name, 'slug', c.slug))
+           FROM categories c
+           JOIN post_categories pc ON pc.category_id = c.id
+           WHERE pc.post_id = p.id), '[]'
+        ) as categories,
+        (SELECT COUNT(*) FROM page_views pv WHERE pv.post_slug = p.slug)::int as views_count,
+        (SELECT COUNT(*) FROM likes l WHERE l.post_slug = p.slug)::int as likes_count,
+        (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
+      FROM posts p
+      WHERE ${whereClause}
+      ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
+      LIMIT ${limit} OFFSET ${offset}
+    `
+
+    if (search && categoryId) {
+      posts = await sql.unsafe(baseQuery.replace('$search', `'${search.replace(/'/g, "''")}'`).replace('$categoryId', categoryId))
+    } else if (search) {
+      posts = await sql.unsafe(baseQuery.replace('$search', `'${search.replace(/'/g, "''")}'`))
+    } else if (categoryId) {
+      posts = await sql.unsafe(baseQuery.replace('$categoryId', categoryId))
+    } else {
+      posts = await sql.unsafe(baseQuery)
+    }
+
+    return NextResponse.json({
+      posts,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages
+      }
+    })
   } catch (error) {
     console.error('Get posts error:', error)
     return NextResponse.json({ error: 'Failed to get posts' }, { status: 500 })

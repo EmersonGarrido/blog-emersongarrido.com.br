@@ -20,8 +20,8 @@ export default function EditPostPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [title, setTitle] = useState('')
-  const [excerpt, setExcerpt] = useState('')
   const [content, setContent] = useState('')
+  const [showSharePreview, setShowSharePreview] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState<number[]>([])
   const [published, setPublished] = useState(false)
   const [error, setError] = useState('')
@@ -53,7 +53,6 @@ export default function EditPostPage() {
 
       if (postData.post) {
         setTitle(postData.post.title || '')
-        setExcerpt(postData.post.excerpt || '')
         setContent(typeof postData.post.content === 'string' ? postData.post.content : '')
         setPublished(postData.post.published || false)
         setSelectedCategories(Array.isArray(postData.post.categories) ? postData.post.categories.map((c: Category) => c.id) : [])
@@ -79,6 +78,24 @@ export default function EditPostPage() {
     setError('')
 
     try {
+      // Auto-generate excerpt from first ~4 lines of content (strip markdown)
+      const plainText = content
+        .replace(/```[\s\S]*?```/g, '') // remove code blocks
+        .replace(/`[^`]+`/g, '') // remove inline code
+        .replace(/#{1,6}\s/g, '') // remove headings
+        .replace(/\*\*([^*]+)\*\*/g, '$1') // remove bold
+        .replace(/\*([^*]+)\*/g, '$1') // remove italic
+        .replace(/~~([^~]+)~~/g, '$1') // remove strikethrough
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // remove links, keep text
+        .replace(/!\[\]\([^)]+\)/g, '') // remove images
+        .replace(/^>\s/gm, '') // remove blockquotes
+        .replace(/^-\s/gm, '') // remove list items
+        .replace(/\n+/g, ' ') // normalize newlines
+        .trim()
+
+      // Get first ~500 chars for 4 lines
+      const excerpt = plainText.slice(0, 500).trim()
+
       const res = await fetch(`/api/admin/posts/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -181,7 +198,6 @@ export default function EditPostPage() {
         {showPreview ? (
           <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
             <h1 className="text-3xl font-bold mb-4">{title || 'Sem título'}</h1>
-            {excerpt && <p className="text-white/60 mb-6">{excerpt}</p>}
             <div className="prose prose-invert max-w-none">
               <div dangerouslySetInnerHTML={{ __html: markdownToHtml(content) }} />
             </div>
@@ -196,17 +212,6 @@ export default function EditPostPage() {
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Título do post"
                 className="w-full px-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-2xl font-bold placeholder-white/30 focus:outline-none focus:border-white/20"
-              />
-            </div>
-
-            {/* Excerpt */}
-            <div>
-              <input
-                type="text"
-                value={excerpt}
-                onChange={(e) => setExcerpt(e.target.value)}
-                placeholder="Resumo do post (aparece na listagem)"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-white/20"
               />
             </div>
 
@@ -242,6 +247,52 @@ export default function EditPostPage() {
                   ))
                 )}
               </div>
+            </div>
+
+            {/* Share Preview */}
+            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+              <button
+                type="button"
+                onClick={() => setShowSharePreview(!showSharePreview)}
+                className="w-full flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                  </svg>
+                  <span className="text-sm font-medium">Preview de Compartilhamento</span>
+                </div>
+                <svg className={`w-4 h-4 text-white/40 transition-transform ${showSharePreview ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {showSharePreview && (
+                <div className="mt-4 space-y-3">
+                  <p className="text-xs text-white/40">Como vai aparecer ao compartilhar nas redes sociais:</p>
+                  {/* OG Card Preview */}
+                  <div className="bg-[#1a1a1b] border border-white/10 rounded-xl overflow-hidden max-w-md">
+                    <div className="aspect-[1.91/1] bg-gradient-to-br from-neutral-800 to-neutral-900 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-white/10 flex items-center justify-center">
+                          <svg className="w-8 h-8 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <p className="text-xs text-white/30">Avatar padrão será usado</p>
+                      </div>
+                    </div>
+                    <div className="p-3">
+                      <p className="text-xs text-white/40 mb-1">emersongarrido.com.br</p>
+                      <p className="font-semibold text-white text-sm line-clamp-2">
+                        {title || 'Título do post'}
+                      </p>
+                      <p className="text-xs text-white/60 mt-1 line-clamp-2">
+                        {content ? content.replace(/[#*`\[\]()>-]/g, '').slice(0, 150).trim() || 'Descrição do post...' : 'Descrição do post...'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Publish Toggle */}

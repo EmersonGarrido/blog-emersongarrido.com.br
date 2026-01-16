@@ -25,6 +25,7 @@ export default function Comments({ postSlug }: CommentsProps) {
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [showForm, setShowForm] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   // Load comments
@@ -118,140 +119,167 @@ export default function Comments({ postSlug }: CommentsProps) {
   }
 
   return (
-    <div id="comments" className="mt-8 pt-6 border-t border-[var(--border-color)]">
-      <h3 className="text-lg font-semibold mb-4">
-        {locale === 'en' ? 'Comments' : 'Comentários'}
-        {comments.length > 0 && ` (${comments.length})`}
-      </h3>
+    <div id="comments" className="mt-6 pt-4 border-t border-[var(--border-color)]">
+      {/* Collapsed State - Just a button */}
+      {!showForm && (
+        <button
+          onClick={() => setShowForm(true)}
+          className="w-full flex items-center justify-center gap-2 py-3 text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors text-sm"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+          {locale === 'en' ? 'Add a comment' : 'Comentar'}
+          {comments.length > 0 && ` (${comments.length})`}
+        </button>
+      )}
 
-      {/* Comment Form */}
-      <form onSubmit={handleSubmit} className="mb-6 space-y-3">
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder={locale === 'en' ? 'Write a comment...' : 'Escreva um comentário...'}
-          maxLength={2000}
-          rows={3}
-          className="w-full px-4 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
-        />
-        <div className="flex items-center gap-3">
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder={locale === 'en' ? 'Your name (for moderation only)' : 'Seu nome (apenas para moderação)'}
-            maxLength={100}
-            className="flex-1 px-4 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-          />
-          <button
-            type="submit"
-            disabled={submitting || !content.trim()}
-            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
-          >
-            {submitting
-              ? (locale === 'en' ? 'Sending...' : 'Enviando...')
-              : (locale === 'en' ? 'Send' : 'Enviar')
-            }
-          </button>
-        </div>
-        <span className="text-xs text-[var(--text-muted)] block">
-          {locale === 'en'
-            ? 'Your name will be hidden. Comments appear as anonymous.'
-            : 'Seu nome ficará oculto. Comentários aparecem como anônimo.'}
-        </span>
-      </form>
-
-      {/* Message */}
+      {/* Expanded State - Full form and comments */}
       <AnimatePresence>
-        {message && (
+        {showForm && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className={`mb-4 p-3 rounded-lg text-sm ${
-              message.type === 'success'
-                ? 'bg-green-500/20 text-green-400'
-                : 'bg-red-500/20 text-red-400'
-            }`}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
           >
-            {message.text}
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-semibold">
+                {locale === 'en' ? 'Comments' : 'Comentários'}
+                {comments.length > 0 && ` (${comments.length})`}
+              </h3>
+              <button
+                onClick={() => setShowForm(false)}
+                className="p-1 hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors text-[var(--text-muted)]"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Comment Form */}
+            <form onSubmit={handleSubmit} className="mb-4 space-y-2">
+              <textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder={locale === 'en' ? 'Write a comment...' : 'Escreva um comentário...'}
+                maxLength={2000}
+                rows={2}
+                className="w-full px-3 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
+              />
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder={locale === 'en' ? 'Name (optional)' : 'Nome (opcional)'}
+                  maxLength={100}
+                  className="flex-1 px-3 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                />
+                <button
+                  type="submit"
+                  disabled={submitting || !content.trim()}
+                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  {submitting ? '...' : (locale === 'en' ? 'Send' : 'Enviar')}
+                </button>
+              </div>
+            </form>
+
+            {/* Message */}
+            <AnimatePresence>
+              {message && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className={`mb-4 p-3 rounded-lg text-sm ${
+                    message.type === 'success'
+                      ? 'bg-green-500/20 text-green-400'
+                      : 'bg-red-500/20 text-red-400'
+                  }`}
+                >
+                  {message.text}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Comments List */}
+            {loading ? (
+              <div className="space-y-3">
+                {[1, 2].map((i) => (
+                  <div key={i} className="animate-pulse">
+                    <div className="h-4 bg-[var(--bg-tertiary)] rounded w-24 mb-2" />
+                    <div className="h-12 bg-[var(--bg-tertiary)] rounded" />
+                  </div>
+                ))}
+              </div>
+            ) : comments.length === 0 ? (
+              <p className="text-[var(--text-muted)] text-sm text-center py-3">
+                {locale === 'en' ? 'No comments yet. Be the first!' : 'Nenhum comentário ainda. Seja o primeiro!'}
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {comments.map((comment, index) => (
+                  <motion.div
+                    key={comment.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="bg-[var(--bg-tertiary)] rounded-lg p-3"
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-6 h-6 rounded-full bg-[var(--bg-hover)] flex items-center justify-center">
+                        <svg className="w-3 h-3 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-xs">{locale === 'en' ? 'Anonymous' : 'Anônimo'}</span>
+                        <span className="text-[var(--text-muted)] text-xs">
+                          {formatDate(comment.created_at)}
+                        </span>
+                        {comment.is_edited && (
+                          <span className="text-[var(--text-muted)] text-xs italic">
+                            ({locale === 'en' ? 'edited' : 'editado'})
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-[var(--text-secondary)] text-sm whitespace-pre-wrap">
+                      {comment.content}
+                    </p>
+                    {/* Like button */}
+                    <div className="mt-2 flex items-center">
+                      <button
+                        onClick={() => handleCommentLike(comment.id, comment.is_liked || false)}
+                        className={`flex items-center gap-1 text-xs transition-colors ${
+                          comment.is_liked ? 'text-red-500' : 'text-[var(--text-muted)] hover:text-red-500'
+                        }`}
+                      >
+                        <svg
+                          className="w-3.5 h-3.5"
+                          fill={comment.is_liked ? 'currentColor' : 'none'}
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                          />
+                        </svg>
+                        <span>{comment.likes_count || 0}</span>
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Comments List */}
-      {loading ? (
-        <div className="space-y-4">
-          {[1, 2].map((i) => (
-            <div key={i} className="animate-pulse">
-              <div className="h-4 bg-[var(--bg-tertiary)] rounded w-24 mb-2" />
-              <div className="h-12 bg-[var(--bg-tertiary)] rounded" />
-            </div>
-          ))}
-        </div>
-      ) : comments.length === 0 ? (
-        <p className="text-[var(--text-muted)] text-sm text-center py-4">
-          {locale === 'en' ? 'No comments yet. Be the first!' : 'Nenhum comentário ainda. Seja o primeiro!'}
-        </p>
-      ) : (
-        <div className="space-y-4">
-          {comments.map((comment, index) => (
-            <motion.div
-              key={comment.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="bg-[var(--bg-tertiary)] rounded-lg p-4"
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-full bg-[var(--bg-hover)] flex items-center justify-center text-sm font-medium">
-                  <svg className="w-4 h-4 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium text-sm">{locale === 'en' ? 'Anonymous' : 'Anônimo'}</span>
-                  <span className="text-[var(--text-muted)] text-xs">
-                    {formatDate(comment.created_at)}
-                  </span>
-                  {comment.is_edited && (
-                    <span className="text-[var(--text-muted)] text-xs italic">
-                      ({locale === 'en' ? 'edited' : 'editado'})
-                    </span>
-                  )}
-                </div>
-              </div>
-              <p className="text-[var(--text-secondary)] text-sm whitespace-pre-wrap">
-                {comment.content}
-              </p>
-              {/* Like button */}
-              <div className="mt-3 flex items-center">
-                <button
-                  onClick={() => handleCommentLike(comment.id, comment.is_liked || false)}
-                  className={`flex items-center gap-1.5 text-xs transition-colors ${
-                    comment.is_liked ? 'text-red-500' : 'text-[var(--text-muted)] hover:text-red-500'
-                  }`}
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill={comment.is_liked ? 'currentColor' : 'none'}
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                    />
-                  </svg>
-                  <span>{comment.likes_count || 0}</span>
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      )}
     </div>
   )
 }

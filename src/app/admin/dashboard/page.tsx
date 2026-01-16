@@ -28,6 +28,7 @@ interface Analytics {
     utm_source: string | null
     country: string | null
     city: string | null
+    user_agent: string | null
     created_at: string
   }>
   onlineUsersByLocation: Array<{ location: string; country: string; users: number }>
@@ -180,6 +181,36 @@ export default function AdminDashboard() {
 
   const getMaxValue = (arr: Array<{ views?: number; likes?: number; comments?: number; users?: number }>) => {
     return Math.max(...arr.map(item => item.views || item.likes || item.comments || item.users || 0), 1)
+  }
+
+  const parseUserAgent = (ua: string | null): { device: string; browser: string } => {
+    if (!ua) return { device: '-', browser: '-' }
+
+    // Detect device
+    let device = 'Desktop'
+    if (/Mobile|Android|iPhone|iPad|iPod/i.test(ua)) {
+      if (/iPad/i.test(ua)) {
+        device = 'Tablet'
+      } else {
+        device = 'Mobile'
+      }
+    }
+
+    // Detect browser
+    let browser = 'Outro'
+    if (/Chrome/i.test(ua) && !/Edge|Edg/i.test(ua)) {
+      browser = 'Chrome'
+    } else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) {
+      browser = 'Safari'
+    } else if (/Firefox/i.test(ua)) {
+      browser = 'Firefox'
+    } else if (/Edge|Edg/i.test(ua)) {
+      browser = 'Edge'
+    } else if (/Opera|OPR/i.test(ua)) {
+      browser = 'Opera'
+    }
+
+    return { device, browser }
   }
 
   if (loading && !analytics) {
@@ -431,7 +462,7 @@ export default function AdminDashboard() {
                       className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full text-xs"
                     >
                       <span className="text-white/60">
-                        {user.page === 'home' ? 'Home' : user.page}
+                        {user.page === 'home' ? 'Principal' : user.page}
                       </span>
                       {user.city && (
                         <span className="text-white/30">
@@ -658,38 +689,53 @@ export default function AdminDashboard() {
                     <tr className="text-white/40 text-left text-xs">
                       <th className="pb-3 font-medium">Pagina</th>
                       <th className="pb-3 font-medium">Fonte</th>
+                      <th className="pb-3 font-medium">Dispositivo</th>
+                      <th className="pb-3 font-medium">Navegador</th>
                       <th className="pb-3 font-medium">Local</th>
                       <th className="pb-3 font-medium">Data</th>
                     </tr>
                   </thead>
                   <tbody className="text-white/60">
-                    {analytics.recentViews.map((view) => (
-                      <tr key={view.id} className="border-t border-white/5 hover:bg-white/5 transition-colors">
-                        <td className="py-3">
-                          <a
-                            href={view.page_type === 'post' ? `/post/${view.post_slug}` : '/'}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:text-white transition-colors"
-                          >
-                            {view.post_slug || view.page_type}
-                          </a>
-                        </td>
-                        <td className="py-3">
-                          <span className={`px-2 py-0.5 rounded text-xs ${
-                            view.utm_source === 'whatsapp' ? 'bg-green-500/20 text-green-400' :
-                            view.utm_source === 'twitter' ? 'bg-blue-500/20 text-blue-400' :
-                            view.utm_source === 'instagram' ? 'bg-pink-500/20 text-pink-400' :
-                            view.utm_source === 'facebook' ? 'bg-blue-600/20 text-blue-300' :
-                            'bg-white/10 text-white/50'
-                          }`}>
-                            {view.utm_source || 'direct'}
-                          </span>
-                        </td>
-                        <td className="py-3">{view.city ? `${view.city}, ${view.country}` : view.country || '-'}</td>
-                        <td className="py-3 text-white/40">{formatDate(view.created_at)}</td>
-                      </tr>
-                    ))}
+                    {analytics.recentViews.map((view) => {
+                      const { device, browser } = parseUserAgent(view.user_agent)
+                      return (
+                        <tr key={view.id} className="border-t border-white/5 hover:bg-white/5 transition-colors">
+                          <td className="py-3">
+                            <a
+                              href={view.page_type === 'post' ? `/post/${view.post_slug}` : '/'}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:text-white transition-colors"
+                            >
+                              {view.page_type === 'home' ? 'Principal' : view.post_slug || view.page_type}
+                            </a>
+                          </td>
+                          <td className="py-3">
+                            <span className={`px-2 py-0.5 rounded text-xs ${
+                              view.utm_source === 'whatsapp' ? 'bg-green-500/20 text-green-400' :
+                              view.utm_source === 'twitter' ? 'bg-blue-500/20 text-blue-400' :
+                              view.utm_source === 'instagram' ? 'bg-pink-500/20 text-pink-400' :
+                              view.utm_source === 'facebook' ? 'bg-blue-600/20 text-blue-300' :
+                              'bg-white/10 text-white/50'
+                            }`}>
+                              {view.utm_source || 'direct'}
+                            </span>
+                          </td>
+                          <td className="py-3">
+                            <span className={`text-xs ${
+                              device === 'Mobile' ? 'text-purple-400' :
+                              device === 'Tablet' ? 'text-orange-400' :
+                              'text-white/50'
+                            }`}>
+                              {device === 'Mobile' ? '📱' : device === 'Tablet' ? '📱' : '💻'} {device}
+                            </span>
+                          </td>
+                          <td className="py-3 text-white/50 text-xs">{browser}</td>
+                          <td className="py-3">{view.city ? `${view.city}, ${view.country}` : view.country || '-'}</td>
+                          <td className="py-3 text-white/40">{formatDate(view.created_at)}</td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
                 {analytics.recentViews.length === 0 && (

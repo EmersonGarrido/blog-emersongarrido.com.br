@@ -136,7 +136,7 @@ export async function GET(request: NextRequest) {
       LIMIT 10
     `
 
-    // Recent views (last 20)
+    // Recent views (last 10)
     const recentViews = await sql`
       SELECT
         id,
@@ -145,10 +145,11 @@ export async function GET(request: NextRequest) {
         utm_source,
         country,
         city,
+        user_agent,
         created_at
       FROM page_views
       ORDER BY created_at DESC
-      LIMIT 20
+      LIMIT 10
     `
 
     // Online users (active in last 5 minutes)

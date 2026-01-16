@@ -161,7 +161,7 @@ export default function PostContent({ post, contentHtml, formattedDate, newerPos
             className="px-5 pb-6 pt-4"
           >
             <div
-              className="prose font-serif text-[18px] text-[var(--text-secondary)] leading-relaxed"
+              className="prose text-[15px] text-[var(--text-secondary)] leading-relaxed"
               dangerouslySetInnerHTML={{ __html: contentHtml }}
             />
 
