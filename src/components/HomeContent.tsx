@@ -133,9 +133,9 @@ export default function HomeContent({ posts }: HomeContentProps) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.45 }}
-            className="mt-3 flex flex-col gap-2 text-neutral-500 text-sm"
+            className="mt-4 p-3 border border-neutral-800 rounded-xl"
           >
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 text-neutral-500 text-sm mb-2">
               From <span className="text-base">🇧🇷</span>
             </span>
             <div className="flex items-center gap-3">
