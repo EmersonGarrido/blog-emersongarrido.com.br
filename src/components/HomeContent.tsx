@@ -5,6 +5,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import PostCard from '@/components/PostCard'
+import { PostSkeletonList } from '@/components/PostSkeleton'
+import ThemeToggle from '@/components/ThemeToggle'
 import { useLocale } from '@/contexts/LocaleContext'
 import type { Post } from '@/lib/posts'
 
@@ -63,16 +65,18 @@ export default function HomeContent({ posts }: HomeContentProps) {
   }, [loadMore, hasMore, loading])
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
       {/* Header simples */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="sticky top-0 z-50 bg-black/90 backdrop-blur-md border-b border-neutral-800"
+        className="sticky top-0 z-50 bg-[var(--bg-primary)]/90 backdrop-blur-md border-b border-[var(--border-color)]"
       >
-        <div className="max-w-xl mx-auto px-4 h-14 flex items-center justify-center">
+        <div className="max-w-xl mx-auto px-2 h-14 flex items-center justify-between">
+          <div className="w-10" />
           <span className="font-semibold">@emersongarrido</span>
+          <ThemeToggle />
         </div>
       </motion.header>
 
@@ -100,12 +104,12 @@ export default function HomeContent({ posts }: HomeContentProps) {
                 transition={{ duration: 0.4, delay: 0.3 }}
                 className="flex items-center gap-2 mt-0.5"
               >
-                <span className="text-neutral-500">@emersongarrido</span>
+                <span className="text-[var(--text-secondary)]">@emersongarrido</span>
                 <a
                   href="https://wa.me/5567993109148"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-neutral-600 hover:text-green-500 transition-colors"
+                  className="text-[var(--text-muted)] hover:text-green-500 transition-colors"
                   title="WhatsApp"
                 >
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -118,7 +122,7 @@ export default function HomeContent({ posts }: HomeContentProps) {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4, delay: 0.2 }}
-              className="w-20 h-20 rounded-full overflow-hidden ring-2 ring-neutral-800"
+              className="w-20 h-20 rounded-full overflow-hidden ring-2 ring-[var(--border-color)]"
             >
               <Image
                 src="/avatar.jpg"
@@ -135,7 +139,7 @@ export default function HomeContent({ posts }: HomeContentProps) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.4 }}
-            className="mt-4 text-[15px] leading-relaxed text-neutral-200"
+            className="mt-4 text-[15px] leading-relaxed text-[var(--text-primary)]"
           >
             {t.age}. {t.bio}
           </motion.p>
@@ -145,37 +149,37 @@ export default function HomeContent({ posts }: HomeContentProps) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.45 }}
-            className="mt-3 flex items-center gap-2 text-neutral-600 text-sm"
+            className="mt-3 flex items-center gap-2 text-[var(--text-muted)] text-sm"
           >
             <span>From</span>
             <div className="group relative">
               <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/18px-Flag_of_Brazil.svg.png" alt="Brasil" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-neutral-200 text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Brasil</span>
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Brasil</span>
             </div>
-            <span className="text-neutral-700">·</span>
+            <span className="text-[var(--text-muted)]">·</span>
             <div className="group relative">
               <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Bandeira_de_Mato_Grosso_do_Sul.svg/18px-Bandeira_de_Mato_Grosso_do_Sul.svg.png" alt="MS" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-neutral-200 text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Campo Grande, MS</span>
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Campo Grande, MS</span>
             </div>
             <div className="group relative">
               <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Bandeira_de_Mato_Grosso.svg/18px-Bandeira_de_Mato_Grosso.svg.png" alt="MT" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-neutral-200 text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">São José do Rio Claro, MT</span>
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">São José do Rio Claro, MT</span>
             </div>
             <div className="group relative">
               <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Bandeira_do_Amazonas.svg/18px-Bandeira_do_Amazonas.svg.png" alt="AM" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-neutral-200 text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Manaus, AM</span>
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Manaus, AM</span>
             </div>
             <div className="group relative">
               <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Bandeira_do_estado_do_Rio_de_Janeiro.svg/18px-Bandeira_do_estado_do_Rio_de_Janeiro.svg.png" alt="RJ" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-neutral-200 text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Rio de Janeiro, RJ</span>
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Rio de Janeiro, RJ</span>
             </div>
             <div className="group relative">
               <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Bandeira_do_Distrito_Federal_%28Brasil%29.svg/18px-Bandeira_do_Distrito_Federal_%28Brasil%29.svg.png" alt="DF" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-neutral-200 text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Brasília, DF</span>
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Brasília, DF</span>
             </div>
             <div className="group relative">
               <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Bandeira_do_estado_de_S%C3%A3o_Paulo.svg/18px-Bandeira_do_estado_de_S%C3%A3o_Paulo.svg.png" alt="SP" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-neutral-200 text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Campinas, Igaratá e Capital, SP</span>
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Campinas, Igaratá e Capital, SP</span>
             </div>
           </motion.div>
 
@@ -186,13 +190,13 @@ export default function HomeContent({ posts }: HomeContentProps) {
             transition={{ duration: 0.4, delay: 0.5 }}
             className="flex items-center gap-4 mt-4"
           >
-            <span className="text-neutral-500 text-[15px]">
-              <strong className="text-white">{posts.length}</strong> posts
+            <span className="text-[var(--text-secondary)] text-[15px]">
+              <strong className="text-[var(--text-primary)]">{posts.length}</strong> posts
             </span>
 
             <Link
               href="/sobre"
-              className="text-neutral-500 hover:text-white text-[15px] transition-colors"
+              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-[15px] transition-colors"
             >
               {locale === 'en' ? 'About me' : 'Sobre mim'}
             </Link>
@@ -204,13 +208,13 @@ export default function HomeContent({ posts }: HomeContentProps) {
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ duration: 0.5, delay: 0.6 }}
-          className="border-t border-neutral-800 origin-left"
+          className="border-t border-[var(--border-color)] origin-left"
         />
 
         {/* Feed */}
         <div className="py-2">
           {visiblePosts.length === 0 && !loading ? (
-            <div className="px-4 py-16 text-center text-neutral-500">
+            <div className="px-4 py-16 text-center text-[var(--text-secondary)]">
               <p>{t.noPosts}</p>
             </div>
           ) : (
@@ -223,31 +227,7 @@ export default function HomeContent({ posts }: HomeContentProps) {
 
           {/* Loader / Infinite Scroll Trigger */}
           <div ref={loaderRef} className="py-8">
-            {loading && (
-              <div className="flex justify-center">
-                <motion.div
-                  className="flex gap-1"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                >
-                  {[0, 1, 2].map((i) => (
-                    <motion.div
-                      key={i}
-                      className="w-2 h-2 bg-neutral-500 rounded-full"
-                      animate={{
-                        scale: [1, 1.5, 1],
-                        opacity: [0.5, 1, 0.5],
-                      }}
-                      transition={{
-                        duration: 0.8,
-                        repeat: Infinity,
-                        delay: i * 0.15,
-                      }}
-                    />
-                  ))}
-                </motion.div>
-              </div>
-            )}
+            {loading && <PostSkeletonList count={2} />}
 
             {!hasMore && visiblePosts.length > 0 && (
               <motion.div
@@ -255,8 +235,8 @@ export default function HomeContent({ posts }: HomeContentProps) {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-center py-8"
               >
-                <p className="text-neutral-600 text-sm">{t.reachedEnd}</p>
-                <p className="text-neutral-700 text-xs mt-1">{t.madeBy}</p>
+                <p className="text-[var(--text-muted)] text-sm">{t.reachedEnd}</p>
+                <p className="text-[var(--text-muted)] text-xs mt-1">{t.madeBy}</p>
               </motion.div>
             )}
           </div>

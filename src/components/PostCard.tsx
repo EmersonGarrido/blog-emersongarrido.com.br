@@ -34,7 +34,7 @@ export default function PostCard({ post, index }: PostCardProps) {
       <div className="flex gap-3">
         {/* Avatar - link to home */}
         <Link href="/" className="flex-shrink-0">
-          <div className="w-10 h-10 rounded-full overflow-hidden hover:ring-2 hover:ring-neutral-700 transition-all">
+          <div className="w-10 h-10 rounded-full overflow-hidden hover:ring-2 hover:ring-[var(--border-color)] transition-all">
             <Image
               src="/avatar.jpg"
               alt="Emerson Garrido"
@@ -49,7 +49,7 @@ export default function PostCard({ post, index }: PostCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <Link href="/" className="font-semibold text-[15px] hover:underline">emersongarrido</Link>
-            <span className="text-neutral-500 text-[15px]">
+            <span className="text-[var(--text-secondary)] text-[15px]">
               {formatDate(post.date)}
               {post.readingTime && (
                 <span> · {post.readingTime} min</span>
@@ -60,7 +60,7 @@ export default function PostCard({ post, index }: PostCardProps) {
           {/* Card com conteúdo - link to post */}
           <Link href={`/post/${post.slug}`}>
             <motion.div
-              className="mt-2 bg-neutral-900 rounded-2xl overflow-hidden hover:bg-neutral-800 active:bg-neutral-700 transition-colors"
+              className="mt-2 bg-[var(--bg-secondary)] rounded-2xl overflow-hidden hover:bg-[var(--bg-tertiary)] active:bg-[var(--bg-hover)] transition-colors"
               whileTap={{ scale: 0.99 }}
             >
               {post.image && (
@@ -74,7 +74,7 @@ export default function PostCard({ post, index }: PostCardProps) {
                 </div>
               )}
               <div className="p-4">
-                <p className="text-[15px] text-neutral-300 leading-relaxed">
+                <p className="text-[15px] text-[var(--text-secondary)] leading-relaxed">
                   {post.excerpt}
                 </p>
                 {post.categories && post.categories.length > 0 && (
@@ -82,14 +82,14 @@ export default function PostCard({ post, index }: PostCardProps) {
                     {post.categories.map((category) => (
                       <span
                         key={category}
-                        className="text-xs px-2 py-0.5 bg-neutral-700/50 text-neutral-400 rounded-full border border-neutral-700"
+                        className="text-xs px-2 py-0.5 bg-[var(--bg-tertiary)] text-[var(--text-muted)] rounded-full border border-[var(--border-color)]"
                       >
                         {category}
                       </span>
                     ))}
                   </div>
                 )}
-                <div className="mt-3 flex items-center gap-1 text-neutral-500 text-sm">
+                <div className="mt-3 flex items-center gap-1 text-[var(--text-secondary)] text-sm">
                   <span>{t.readMore}</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

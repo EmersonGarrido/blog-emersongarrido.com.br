@@ -84,7 +84,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/avatar.jpg" />
         <meta name="theme-color" content="#000000" />
       </head>
-      <body className={`${inter.variable} ${lora.variable} font-sans bg-black min-h-screen`}>
+      <body className={`${inter.variable} ${lora.variable} font-sans min-h-screen`}>
         <Providers>{children}</Providers>
       </body>
     </html>
