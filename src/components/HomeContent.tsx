@@ -165,7 +165,7 @@ export default function HomeContent({ posts }: HomeContentProps) {
         <div className="py-2">
           {visiblePosts.length === 0 && !loading ? (
             <div className="px-4 py-16 text-center text-neutral-500">
-              <p>{locale === 'en' ? 'No posts yet.' : 'Nenhum post ainda.'}</p>
+              <p>{t.noPosts}</p>
             </div>
           ) : (
             <div>
@@ -209,8 +209,8 @@ export default function HomeContent({ posts }: HomeContentProps) {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-center py-8"
               >
-                <p className="text-neutral-600 text-sm">Você chegou ao fim</p>
-                <p className="text-neutral-700 text-xs mt-1">Feito com dedicação por Emerson Garrido</p>
+                <p className="text-neutral-600 text-sm">{t.reachedEnd}</p>
+                <p className="text-neutral-700 text-xs mt-1">{t.madeBy}</p>
               </motion.div>
             )}
           </div>

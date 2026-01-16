@@ -3,19 +3,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
+import { useLocale } from '@/contexts/LocaleContext'
 import type { Post } from '@/lib/posts'
-
-function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-
-  return date.toLocaleDateString('pt-BR', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
 
 interface PostCardProps {
   post: Post
@@ -23,6 +12,18 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post, index }: PostCardProps) {
+  const { t, locale } = useLocale()
+
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString(locale === 'en' ? 'en-US' : 'pt-BR', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
   return (
     <motion.article
       initial={{ opacity: 0, y: 20 }}
@@ -63,7 +64,7 @@ export default function PostCard({ post, index }: PostCardProps) {
                 {post.excerpt}
               </p>
               <div className="mt-3 flex items-center gap-1 text-neutral-500 text-sm">
-                <span>Ler mais</span>
+                <span>{t.readMore}</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>

@@ -9,9 +9,12 @@ export const translations = {
     loading: 'Carregando...',
     noMorePosts: 'Não há mais posts',
     readMore: 'Ler mais',
-    backToHome: 'Voltar',
+    backToHome: 'Voltar ao início',
     publishedAt: 'às',
     contact: 'Contato',
+    reachedEnd: 'Você chegou ao fim',
+    madeBy: 'Feito com dedicação por Emerson Garrido',
+    noPosts: 'Nenhum post ainda.',
   },
   'en': {
     age: '30 years old',
@@ -21,9 +24,12 @@ export const translations = {
     loading: 'Loading...',
     noMorePosts: 'No more posts',
     readMore: 'Read more',
-    backToHome: 'Back',
+    backToHome: 'Back to home',
     publishedAt: 'at',
     contact: 'Contact',
+    reachedEnd: 'You reached the end',
+    madeBy: 'Made with dedication by Emerson Garrido',
+    noPosts: 'No posts yet.',
   },
 }
 

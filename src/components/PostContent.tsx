@@ -3,16 +3,20 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
+import { useLocale } from '@/contexts/LocaleContext'
+import { formatDateByLocale } from '@/lib/i18n'
 import type { Post } from '@/lib/posts'
 
 interface PostContentProps {
   post: Post
   contentHtml: string
   formattedDate: string
-  relatedPosts: Post[]
+  newerPost: Post | null
+  olderPost: Post | null
 }
 
-export default function PostContent({ post, contentHtml, formattedDate, relatedPosts }: PostContentProps) {
+export default function PostContent({ post, contentHtml, formattedDate, newerPost, olderPost }: PostContentProps) {
+  const { t, locale } = useLocale()
   return (
     <div className="min-h-screen bg-black">
       {/* Header */}
@@ -79,38 +83,45 @@ export default function PostContent({ post, contentHtml, formattedDate, relatedP
           </motion.div>
         </motion.article>
 
-        {/* Related Posts */}
-        {relatedPosts.length > 0 && (
+        {/* Post Navigation */}
+        {(newerPost || olderPost) && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.5 }}
-            className="mt-6"
+            className="mt-6 space-y-2"
           >
-            <h3 className="text-neutral-500 text-sm font-medium mb-3 px-1">Mais posts</h3>
-            <div className="space-y-2">
-              {relatedPosts.map((relatedPost, index) => (
-                <motion.div
-                  key={relatedPost.slug}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: 0.6 + index * 0.1 }}
-                >
-                  <Link
-                    href={`/post/${relatedPost.slug}`}
-                    className="block bg-neutral-900/50 hover:bg-neutral-800 rounded-xl p-4 transition-colors"
-                  >
-                    <p className="text-[15px] text-neutral-300 line-clamp-2">{relatedPost.excerpt}</p>
-                    <span className="text-neutral-500 text-sm mt-2 block">
-                      {new Date(relatedPost.date).toLocaleDateString('pt-BR', {
-                        day: 'numeric',
-                        month: 'short',
-                      })}
-                    </span>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
+            {/* Post mais recente */}
+            {newerPost && (
+              <Link
+                href={`/post/${newerPost.slug}`}
+                className="block bg-neutral-900/50 hover:bg-neutral-800 rounded-xl p-4 transition-colors"
+              >
+                <span className="text-neutral-500 text-xs uppercase tracking-wide flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                  </svg>
+                  {locale === 'en' ? 'Newer post' : 'Post mais recente'}
+                </span>
+                <p className="text-[15px] text-neutral-300 mt-2 line-clamp-2">{newerPost.excerpt}</p>
+              </Link>
+            )}
+
+            {/* Post mais antigo */}
+            {olderPost && (
+              <Link
+                href={`/post/${olderPost.slug}`}
+                className="block bg-neutral-900/50 hover:bg-neutral-800 rounded-xl p-4 transition-colors"
+              >
+                <span className="text-neutral-500 text-xs uppercase tracking-wide flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                  {locale === 'en' ? 'Older post' : 'Post mais antigo'}
+                </span>
+                <p className="text-[15px] text-neutral-300 mt-2 line-clamp-2">{olderPost.excerpt}</p>
+              </Link>
+            )}
           </motion.div>
         )}
 
@@ -128,7 +139,7 @@ export default function PostContent({ post, contentHtml, formattedDate, relatedP
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            <span className="text-[15px]">Voltar ao início</span>
+            <span className="text-[15px]">{t.backToHome}</span>
           </Link>
         </motion.div>
       </main>

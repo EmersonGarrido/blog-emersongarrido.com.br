@@ -73,16 +73,23 @@ export default async function PostPage({ params }: Props) {
   const contentHtml = await getPostContent(post.content)
   const formattedDate = formatDate(post.date)
 
-  // Pegar outros posts para "relacionados"
+  // Pegar todos os posts ordenados por data (mais recente primeiro)
   const allPosts = getAllPosts()
-  const relatedPosts = allPosts.filter(p => p.slug !== params.slug).slice(0, 3)
+
+  // Encontrar índice do post atual
+  const currentIndex = allPosts.findIndex(p => p.slug === params.slug)
+
+  // Post mais recente (anterior na lista) e mais antigo (próximo na lista)
+  const newerPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null
+  const olderPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null
 
   return (
     <PostContent
       post={post}
       contentHtml={contentHtml}
       formattedDate={formattedDate}
-      relatedPosts={relatedPosts}
+      newerPost={newerPost}
+      olderPost={olderPost}
     />
   )
 }
