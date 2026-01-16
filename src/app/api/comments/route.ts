@@ -32,23 +32,16 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { slug, authorName, content } = body
 
-    if (!slug || !authorName || !content) {
+    if (!slug || !content) {
       return NextResponse.json(
-        { error: 'Slug, authorName and content are required' },
+        { error: 'Slug and content are required' },
         { status: 400 }
       )
     }
 
-    // Sanitize inputs
-    const sanitizedName = authorName.trim().slice(0, 100)
+    // Sanitize inputs - name is optional, defaults to "Anônimo"
+    const sanitizedName = authorName?.trim().slice(0, 100) || 'Anônimo'
     const sanitizedContent = content.trim().slice(0, 2000)
-
-    if (sanitizedName.length < 2) {
-      return NextResponse.json(
-        { error: 'Nome muito curto' },
-        { status: 400 }
-      )
-    }
 
     if (sanitizedContent.length < 3) {
       return NextResponse.json(

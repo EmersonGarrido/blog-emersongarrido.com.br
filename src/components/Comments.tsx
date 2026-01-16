@@ -99,14 +99,6 @@ export default function Comments({ postSlug }: CommentsProps) {
 
       {/* Comment Form */}
       <form onSubmit={handleSubmit} className="mb-6 space-y-3">
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder={locale === 'en' ? 'Your name' : 'Seu nome'}
-          maxLength={100}
-          className="w-full px-4 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-        />
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
@@ -115,13 +107,18 @@ export default function Comments({ postSlug }: CommentsProps) {
           rows={3}
           className="w-full px-4 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
         />
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-[var(--text-muted)]">
-            {locale === 'en' ? 'Comments are moderated' : 'Comentários são moderados'}
-          </span>
+        <div className="flex items-center gap-3">
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={locale === 'en' ? 'Your name (optional)' : 'Seu nome (opcional)'}
+            maxLength={100}
+            className="flex-1 px-4 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+          />
           <button
             type="submit"
-            disabled={submitting || !name.trim() || !content.trim()}
+            disabled={submitting || !content.trim()}
             className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
           >
             {submitting
@@ -130,6 +127,9 @@ export default function Comments({ postSlug }: CommentsProps) {
             }
           </button>
         </div>
+        <span className="text-xs text-[var(--text-muted)] block">
+          {locale === 'en' ? 'Comments are moderated' : 'Comentários são moderados'}
+        </span>
       </form>
 
       {/* Message */}

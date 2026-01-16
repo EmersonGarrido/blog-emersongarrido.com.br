@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
       ORDER BY date DESC
     `
 
-    // Top pages
+    // Top pages by views
     const topPages = await sql`
       SELECT
         COALESCE(post_slug, page_type) as page,
@@ -70,6 +70,30 @@ export async function GET(request: NextRequest) {
       WHERE 1=1 ${sql.unsafe(dateFilter)}
       GROUP BY COALESCE(post_slug, page_type), page_type
       ORDER BY views DESC
+      LIMIT 10
+    `
+
+    // Posts with most likes
+    const topPostsByLikes = await sql`
+      SELECT
+        post_slug,
+        COUNT(*) as likes
+      FROM likes
+      WHERE page_type = 'post'
+      GROUP BY post_slug
+      ORDER BY likes DESC
+      LIMIT 10
+    `
+
+    // Posts with most comments
+    const topPostsByComments = await sql`
+      SELECT
+        post_slug,
+        COUNT(*) as comments
+      FROM comments
+      WHERE is_approved = true
+      GROUP BY post_slug
+      ORDER BY comments DESC
       LIMIT 10
     `
 
@@ -97,7 +121,7 @@ export async function GET(request: NextRequest) {
       LIMIT 10
     `
 
-    // Cities
+    // Cities with country
     const cities = await sql`
       SELECT
         COALESCE(city, 'Unknown') as city,
@@ -125,20 +149,62 @@ export async function GET(request: NextRequest) {
       LIMIT 20
     `
 
+    // Online users (active in last 5 minutes)
+    const onlineUsersResult = await sql`
+      SELECT
+        COUNT(DISTINCT visitor_id) as count
+      FROM page_views
+      WHERE created_at > NOW() - INTERVAL '5 minutes'
+    `
+    const onlineUsers = parseInt(onlineUsersResult[0].count as string) || 0
+
+    // Online users by location
+    const onlineUsersByLocation = await sql`
+      SELECT
+        COALESCE(city, country, 'Unknown') as location,
+        country,
+        COUNT(DISTINCT visitor_id) as users
+      FROM page_views
+      WHERE created_at > NOW() - INTERVAL '5 minutes'
+      GROUP BY COALESCE(city, country, 'Unknown'), country
+      ORDER BY users DESC
+      LIMIT 10
+    `
+
+    // Currently viewing (what pages are being viewed right now)
+    const currentlyViewing = await sql`
+      SELECT DISTINCT ON (visitor_id)
+        visitor_id,
+        COALESCE(post_slug, page_type) as page,
+        page_type,
+        city,
+        country,
+        created_at
+      FROM page_views
+      WHERE created_at > NOW() - INTERVAL '5 minutes'
+      ORDER BY visitor_id, created_at DESC
+      LIMIT 20
+    `
+
     return NextResponse.json({
       summary: {
         totalViews,
         uniqueVisitors,
         totalLikes,
         totalComments,
-        pendingComments
+        pendingComments,
+        onlineUsers
       },
       viewsByDay,
       topPages,
+      topPostsByLikes,
+      topPostsByComments,
       trafficSources,
       countries,
       cities,
-      recentViews
+      recentViews,
+      onlineUsersByLocation,
+      currentlyViewing
     })
   } catch (error) {
     console.error('Analytics error:', error)
