@@ -96,13 +96,60 @@ export default function SobrePage() {
             Muita coisa aconteceu, muita coisa ainda tá acontecendo. Esse espaço aqui é pra documentar, pra colocar pra fora, pra não guardar tudo sozinho.
           </p>
 
+          <p className="text-neutral-500 italic mt-8 mb-8">
+            ...
+          </p>
+
+          <p>
+            Comecei a trabalhar com 10 anos. Vendia gelinho, picolé, limpava caminhão pra pegar soja e vender os sacos. Era criança, mas já queria meu dinheiro. Não lembro nem no que gastava, mas lembro que era meu e eu podia fazer o que quisesse.
+          </p>
+
+          <p>
+            Nessa época ganhei meu primeiro computador. Daqueles brancos de tubo, com internet discada que só funcionava direito de madrugada. Passava horas navegando, buscando entender como as coisas funcionavam.
+          </p>
+
+          <p>
+            Aos 13 pra 14 anos, entrei num fórum chamado ZoneGames e aprendi a criar servidores de jogos. Servidores piratas de MU Online. Meus olhos brilhavam vendo o que eu conseguia fazer. Eram coisas bobas seguindo tutorial, mas pra mim era mágico ver como algumas palavrinhas, alguns blocos de texto editados, faziam tanta diferença.
+          </p>
+
+          <p>
+            Ali fiz amigos que tenho até hoje. Mais de 15 anos depois e ainda não conheço vários deles pessoalmente. Mas o tempo validou tanto nossa amizade que não precisa estar perto pra ter respeito. O que manteve a gente foi simples: só dividimos vitórias, nunca problemas.
+          </p>
+
+          <p>
+            Aprendi Photoshop, CorelDraw, edição de vídeo, sincronia de áudio. Criava capas, menus interativos, fazia coisas que nem sabia que iam me servir no futuro. Tudo isso virando madrugada, vivendo de energético.
+          </p>
+
+          <p>
+            Meu primeiro emprego "de verdade" foi num jornal. Vi um anúncio, mandei e-mail, e em 20 minutos me chamaram pra entrevista. Fui de chinelo, short velho, camiseta e boné. Meu pai falou que eu não podia ir daquele jeito. Fui assim mesmo.
+          </p>
+
+          <p>
+            O dono me olhou de cima a baixo e perguntou por que eu tinha ido daquele jeito. Respondi que tinha plena confiança que sabia fazer o trabalho, então aparência não era importante naquele momento. Ele sorriu e me contratou. Acho que foi pela coragem.
+          </p>
+
+          <p>
+            Reconstruí o site do jornal em 1 semana. O cara anterior, um professor de faculdade, tava enrolando há 6 meses. Depois disso trabalhei em gráfica, aprendi todo o processo de impressão, offset, acabamento. Passei por designer, web designer, programador, redator.
+          </p>
+
+          <p>
+            Cada lugar que passei, cada perrengue que vivi, me ensinou alguma coisa. Até as coisas erradas que fiz me trouxeram aprendizado. Hoje uso tudo isso pra construir sistemas, resolver problemas, criar coisas que funcionam.
+          </p>
+
+          <p>
+            Tenho 1,97m de altura. Três filhos que amo. Já casei duas vezes. Já quebrei as duas pernas, o queixo, o ombro. Tenho mais de 24 parafusos na perna esquerda. O joelho ainda falha às vezes, parece que piso e não tem chão.
+          </p>
+
+          <p>
+            Mas tô aqui. Escrevendo. Codando. Vivendo. Tentando transformar tudo isso em algo que faça sentido pra alguém.
+          </p>
+
           <p className="text-neutral-500 italic">
             continua...
           </p>
 
           <p className="text-neutral-600 text-sm">
-            Última atualização: 16 de janeiro de 2026, 01:30
-          </p>
+            Última atualização: 16 de janeiro de 2026</p>
         </motion.div>
 
         {/* Back Button */}
