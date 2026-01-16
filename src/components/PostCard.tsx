@@ -17,6 +17,7 @@ export default function PostCard({ post, index }: PostCardProps) {
   const [viewsCount, setViewsCount] = useState(0)
   const [likesCount, setLikesCount] = useState(0)
   const [commentsCount, setCommentsCount] = useState(0)
+  const [sharesCount, setSharesCount] = useState(0)
   const [isLiked, setIsLiked] = useState(false)
 
   useEffect(() => {
@@ -39,6 +40,12 @@ export default function PostCard({ post, index }: PostCardProps) {
     fetch(`/api/comments?slug=${encodeURIComponent(post.slug)}`)
       .then(res => res.json())
       .then(data => setCommentsCount(data.comments?.length || 0))
+      .catch(() => {})
+
+    // Fetch shares count
+    fetch(`/api/shares?slug=${encodeURIComponent(post.slug)}`)
+      .then(res => res.json())
+      .then(data => setSharesCount(data.shares || 0))
       .catch(() => {})
   }, [post.slug])
 
@@ -63,6 +70,44 @@ export default function PostCard({ post, index }: PostCardProps) {
         setIsLiked(true)
       }
     } catch {}
+  }
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const shareUrl = `${window.location.origin}/post/${post.slug}?utm_source=share&utm_medium=post`
+    const shareData = {
+      title: post.title || post.excerpt?.slice(0, 50) || 'Post',
+      text: post.excerpt?.slice(0, 100) || '',
+      url: shareUrl
+    }
+
+    let method = 'copy'
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData)
+        method = 'native'
+      } else {
+        await navigator.clipboard.writeText(shareUrl)
+        alert(locale === 'en' ? 'Link copied!' : 'Link copiado!')
+      }
+
+      // Track the share
+      const res = await fetch('/api/shares', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: post.slug, method })
+      })
+      const data = await res.json()
+      setSharesCount(data.shares || sharesCount + 1)
+    } catch (error) {
+      // User cancelled share or error
+      if ((error as Error).name !== 'AbortError') {
+        console.error('Share error:', error)
+      }
+    }
   }
 
   const formatDate = (dateString: string): string => {
@@ -204,6 +249,22 @@ export default function PostCard({ post, index }: PostCardProps) {
               </svg>
               <span>{commentsCount}</span>
             </Link>
+
+            {/* Share */}
+            <button
+              onClick={handleShare}
+              className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-green-400 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                />
+              </svg>
+              <span>{sharesCount}</span>
+            </button>
 
           </div>
         </div>
