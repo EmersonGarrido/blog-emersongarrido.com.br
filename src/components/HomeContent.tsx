@@ -148,14 +148,35 @@ export default function HomeContent({ posts }: HomeContentProps) {
             className="mt-3 flex items-center gap-2 text-neutral-600 text-sm"
           >
             <span>From</span>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/18px-Flag_of_Brazil.svg.png" alt="Brasil" title="Brasil" className="h-3 rounded-sm" />
+            <div className="group relative">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/18px-Flag_of_Brazil.svg.png" alt="Brasil" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-neutral-200 text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Brasil</span>
+            </div>
             <span className="text-neutral-700">·</span>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Bandeira_de_Mato_Grosso_do_Sul.svg/18px-Bandeira_de_Mato_Grosso_do_Sul.svg.png" alt="MS" title="Mato Grosso do Sul" className="h-3 rounded-sm" />
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Bandeira_do_Distrito_Federal_%28Brasil%29.svg/18px-Bandeira_do_Distrito_Federal_%28Brasil%29.svg.png" alt="DF" title="Distrito Federal" className="h-3 rounded-sm" />
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Bandeira_do_estado_do_Rio_de_Janeiro.svg/18px-Bandeira_do_estado_do_Rio_de_Janeiro.svg.png" alt="RJ" title="Rio de Janeiro" className="h-3 rounded-sm" />
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Bandeira_do_Amazonas.svg/18px-Bandeira_do_Amazonas.svg.png" alt="AM" title="Amazonas" className="h-3 rounded-sm" />
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Bandeira_de_Mato_Grosso.svg/18px-Bandeira_de_Mato_Grosso.svg.png" alt="MT" title="Mato Grosso" className="h-3 rounded-sm" />
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Bandeira_do_estado_de_S%C3%A3o_Paulo.svg/18px-Bandeira_do_estado_de_S%C3%A3o_Paulo.svg.png" alt="SP" title="São Paulo" className="h-3 rounded-sm" />
+            <div className="group relative">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Bandeira_de_Mato_Grosso_do_Sul.svg/18px-Bandeira_de_Mato_Grosso_do_Sul.svg.png" alt="MS" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-neutral-200 text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Campo Grande, MS</span>
+            </div>
+            <div className="group relative">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Bandeira_de_Mato_Grosso.svg/18px-Bandeira_de_Mato_Grosso.svg.png" alt="MT" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-neutral-200 text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">São José do Rio Claro, MT</span>
+            </div>
+            <div className="group relative">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Bandeira_do_Amazonas.svg/18px-Bandeira_do_Amazonas.svg.png" alt="AM" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-neutral-200 text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Manaus, AM</span>
+            </div>
+            <div className="group relative">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Bandeira_do_estado_do_Rio_de_Janeiro.svg/18px-Bandeira_do_estado_do_Rio_de_Janeiro.svg.png" alt="RJ" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-neutral-200 text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Rio de Janeiro, RJ</span>
+            </div>
+            <div className="group relative">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Bandeira_do_Distrito_Federal_%28Brasil%29.svg/18px-Bandeira_do_Distrito_Federal_%28Brasil%29.svg.png" alt="DF" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-neutral-200 text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Brasília, DF</span>
+            </div>
+            <div className="group relative">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Bandeira_do_estado_de_S%C3%A3o_Paulo.svg/18px-Bandeira_do_estado_de_S%C3%A3o_Paulo.svg.png" alt="SP" className="h-3 rounded-sm cursor-pointer hover:scale-110 transition-transform" />
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-neutral-200 text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Campinas, Igaratá e Capital, SP</span>
+            </div>
           </motion.div>
 
           {/* Stats */}
