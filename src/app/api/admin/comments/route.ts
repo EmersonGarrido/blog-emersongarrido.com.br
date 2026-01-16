@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PATCH - Update comment (approve/reject/spam)
+// PATCH - Update comment (approve/reject/spam/edit)
 export async function PATCH(request: NextRequest) {
   const authenticated = await isAuthenticated()
   if (!authenticated) {
@@ -56,11 +56,35 @@ export async function PATCH(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { id, action } = body
+    const { id, action, content } = body
 
-    if (!id || !action) {
+    if (!id) {
       return NextResponse.json(
-        { error: 'ID and action are required' },
+        { error: 'ID is required' },
+        { status: 400 }
+      )
+    }
+
+    // Handle edit action
+    if (action === 'edit' && content !== undefined) {
+      // First ensure is_edited column exists
+      await sql`
+        DO $$ BEGIN
+          ALTER TABLE comments ADD COLUMN IF NOT EXISTS is_edited BOOLEAN DEFAULT false;
+        EXCEPTION
+          WHEN duplicate_column THEN NULL;
+        END $$;
+      `
+
+      await sql`
+        UPDATE comments SET content = ${content}, is_edited = true WHERE id = ${id}
+      `
+      return NextResponse.json({ success: true })
+    }
+
+    if (!action) {
+      return NextResponse.json(
+        { error: 'Action is required' },
         { status: 400 }
       )
     }
@@ -77,7 +101,7 @@ export async function PATCH(request: NextRequest) {
       await sql`
         UPDATE comments SET is_spam = true, is_approved = false WHERE id = ${id}
       `
-    } else {
+    } else if (action !== 'edit') {
       return NextResponse.json(
         { error: 'Invalid action' },
         { status: 400 }

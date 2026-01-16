@@ -2,6 +2,19 @@ import { sql } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 
+// Ensure comment_likes table exists
+async function ensureCommentLikesTable() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS comment_likes (
+      id SERIAL PRIMARY KEY,
+      comment_id INTEGER NOT NULL REFERENCES comments(id) ON DELETE CASCADE,
+      visitor_id VARCHAR(100) NOT NULL,
+      created_at TIMESTAMP DEFAULT NOW(),
+      UNIQUE(comment_id, visitor_id)
+    )
+  `
+}
+
 // GET - List approved comments for a post
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -12,11 +25,26 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    await ensureCommentLikesTable()
+
+    const headersList = await headers()
+    const ip = headersList.get('x-forwarded-for')?.split(',')[0] ||
+               headersList.get('x-real-ip') ||
+               '127.0.0.1'
+    const visitorId = ip
+
     const comments = await sql`
-      SELECT id, author_name, content, created_at
-      FROM comments
-      WHERE post_slug = ${slug} AND is_approved = true AND is_spam = false
-      ORDER BY created_at DESC
+      SELECT
+        c.id,
+        c.author_name,
+        c.content,
+        c.created_at,
+        COALESCE(c.is_edited, false) as is_edited,
+        (SELECT COUNT(*) FROM comment_likes cl WHERE cl.comment_id = c.id)::int as likes_count,
+        EXISTS(SELECT 1 FROM comment_likes cl WHERE cl.comment_id = c.id AND cl.visitor_id = ${visitorId}) as is_liked
+      FROM comments c
+      WHERE c.post_slug = ${slug} AND c.is_approved = true AND c.is_spam = false
+      ORDER BY c.created_at DESC
     `
 
     return NextResponse.json({ comments })

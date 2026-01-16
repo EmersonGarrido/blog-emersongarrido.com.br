@@ -127,22 +127,30 @@ export default function PostCard({ post, index }: PostCardProps) {
                   />
                 </div>
               )}
-              <div className="p-4">
-                <p className="text-[15px] text-[var(--text-secondary)] leading-relaxed line-clamp-4">
-                  {post.excerpt}
-                </p>
-                {post.categories && post.categories.length > 0 && (
-                  <p className="mt-2">
-                    {post.categories.map((category, i) => (
-                      <span key={category}>
-                        <span className="text-sm text-teal-400 hover:text-teal-300 transition-colors">
-                          #{category.replace(/\s+/g, '')}
-                        </span>
-                        {i < post.categories!.length - 1 && ' '}
-                      </span>
-                    ))}
+              <div className="p-4 flex gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="text-[15px] text-[var(--text-secondary)] leading-relaxed line-clamp-4">
+                    {post.excerpt}
                   </p>
-                )}
+                  {post.categories && post.categories.length > 0 && (
+                    <p className="mt-2">
+                      {post.categories.map((category, i) => (
+                        <span key={category}>
+                          <span className="text-sm text-teal-400 hover:text-teal-300 transition-colors">
+                            #{category.replace(/\s+/g, '')}
+                          </span>
+                          {i < post.categories!.length - 1 && ' '}
+                        </span>
+                      ))}
+                    </p>
+                  )}
+                </div>
+                {/* Arrow indicator */}
+                <div className="flex-shrink-0 flex items-center">
+                  <svg className="w-5 h-5 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
               </div>
             </motion.div>
           </Link>
