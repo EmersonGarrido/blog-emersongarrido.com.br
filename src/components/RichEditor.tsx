@@ -44,6 +44,9 @@ function MenuButton({
 }
 
 export default function RichEditor({ content, onChange, placeholder }: RichEditorProps) {
+  // Ensure content is always a string
+  const safeContent = typeof content === 'string' ? content : ''
+
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -67,7 +70,7 @@ export default function RichEditor({ content, onChange, placeholder }: RichEdito
         placeholder: placeholder || 'Comece a escrever...',
       }),
     ],
-    content: content,
+    content: markdownToHtml(safeContent),
     editorProps: {
       attributes: {
         class: 'prose prose-invert prose-sm max-w-none focus:outline-none min-h-[400px] px-4 py-3',
@@ -82,10 +85,10 @@ export default function RichEditor({ content, onChange, placeholder }: RichEdito
 
   // Update editor content when prop changes
   useEffect(() => {
-    if (editor && content !== htmlToMarkdown(editor.getHTML())) {
-      editor.commands.setContent(markdownToHtml(content))
+    if (editor && safeContent !== htmlToMarkdown(editor.getHTML())) {
+      editor.commands.setContent(markdownToHtml(safeContent))
     }
-  }, [content, editor])
+  }, [safeContent, editor])
 
   const setLink = useCallback(() => {
     if (!editor) return
@@ -288,7 +291,7 @@ export default function RichEditor({ content, onChange, placeholder }: RichEdito
 
       {/* Character count */}
       <div className="px-4 py-2 border-t border-white/10 text-xs text-white/30">
-        {editor.storage.characterCount?.characters?.() || editor.getText().length} caracteres
+        {editor.getText().length} caracteres
       </div>
     </div>
   )

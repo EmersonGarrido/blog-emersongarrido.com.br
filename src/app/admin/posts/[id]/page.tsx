@@ -51,10 +51,10 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
       const categoriesData = await categoriesRes.json()
 
       if (postData.post) {
-        setTitle(postData.post.title)
+        setTitle(postData.post.title || '')
         setExcerpt(postData.post.excerpt || '')
-        setContent(postData.post.content)
-        setPublished(postData.post.published)
+        setContent(typeof postData.post.content === 'string' ? postData.post.content : '')
+        setPublished(postData.post.published || false)
         setSelectedCategories(Array.isArray(postData.post.categories) ? postData.post.categories.map((c: Category) => c.id) : [])
       }
 
