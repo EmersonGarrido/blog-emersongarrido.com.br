@@ -38,7 +38,7 @@ export default function Comments({ postSlug }: CommentsProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name.trim() || !content.trim() || submitting) return
+    if (!content.trim() || submitting) return
 
     setSubmitting(true)
     setMessage(null)
@@ -112,7 +112,7 @@ export default function Comments({ postSlug }: CommentsProps) {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder={locale === 'en' ? 'Your name (optional)' : 'Seu nome (opcional)'}
+            placeholder={locale === 'en' ? 'Your name (for moderation only)' : 'Seu nome (apenas para moderação)'}
             maxLength={100}
             className="flex-1 px-4 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500/50"
           />
@@ -128,7 +128,9 @@ export default function Comments({ postSlug }: CommentsProps) {
           </button>
         </div>
         <span className="text-xs text-[var(--text-muted)] block">
-          {locale === 'en' ? 'Comments are moderated' : 'Comentários são moderados'}
+          {locale === 'en'
+            ? 'Your name will be hidden. Comments appear as anonymous.'
+            : 'Seu nome ficará oculto. Comentários aparecem como anônimo.'}
         </span>
       </form>
 
@@ -176,10 +178,12 @@ export default function Comments({ postSlug }: CommentsProps) {
             >
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-8 h-8 rounded-full bg-[var(--bg-hover)] flex items-center justify-center text-sm font-medium">
-                  {comment.author_name.charAt(0).toUpperCase()}
+                  <svg className="w-4 h-4 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
                 </div>
                 <div>
-                  <span className="font-medium text-sm">{comment.author_name}</span>
+                  <span className="font-medium text-sm">{locale === 'en' ? 'Anonymous' : 'Anônimo'}</span>
                   <span className="text-[var(--text-muted)] text-xs ml-2">
                     {formatDate(comment.created_at)}
                   </span>
