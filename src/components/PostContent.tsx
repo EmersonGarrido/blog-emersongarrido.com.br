@@ -89,38 +89,58 @@ export default function PostContent({ post, contentHtml, formattedDate, newerPos
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.5 }}
-            className="mt-6 space-y-2"
+            className="mt-6 grid grid-cols-2 gap-3"
           >
-            {/* Post mais recente */}
-            {newerPost && (
+            {/* Post mais recente (esquerda) */}
+            {newerPost ? (
               <Link
                 href={`/post/${newerPost.slug}`}
                 className="block bg-neutral-900/50 hover:bg-neutral-800 rounded-xl p-4 transition-colors"
               >
                 <span className="text-neutral-500 text-xs uppercase tracking-wide flex items-center gap-1">
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
-                  {locale === 'en' ? 'Newer post' : 'Post mais recente'}
+                  {locale === 'en' ? 'Newer' : 'Recente'}
                 </span>
-                <p className="text-[15px] text-neutral-300 mt-2 line-clamp-2">{newerPost.excerpt}</p>
+                <p className="text-[14px] text-neutral-300 mt-2 line-clamp-2">{newerPost.excerpt}</p>
+                <span className="text-neutral-600 text-xs mt-2 block">
+                  {new Date(newerPost.date).toLocaleDateString(locale === 'en' ? 'en-US' : 'pt-BR', {
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </span>
               </Link>
+            ) : (
+              <div />
             )}
 
-            {/* Post mais antigo */}
-            {olderPost && (
+            {/* Post mais antigo (direita) */}
+            {olderPost ? (
               <Link
                 href={`/post/${olderPost.slug}`}
-                className="block bg-neutral-900/50 hover:bg-neutral-800 rounded-xl p-4 transition-colors"
+                className="block bg-neutral-900/50 hover:bg-neutral-800 rounded-xl p-4 transition-colors text-right"
               >
-                <span className="text-neutral-500 text-xs uppercase tracking-wide flex items-center gap-1">
+                <span className="text-neutral-500 text-xs uppercase tracking-wide flex items-center gap-1 justify-end">
+                  {locale === 'en' ? 'Older' : 'Antigo'}
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                  {locale === 'en' ? 'Older post' : 'Post mais antigo'}
                 </span>
-                <p className="text-[15px] text-neutral-300 mt-2 line-clamp-2">{olderPost.excerpt}</p>
+                <p className="text-[14px] text-neutral-300 mt-2 line-clamp-2">{olderPost.excerpt}</p>
+                <span className="text-neutral-600 text-xs mt-2 block">
+                  {new Date(olderPost.date).toLocaleDateString(locale === 'en' ? 'en-US' : 'pt-BR', {
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </span>
               </Link>
+            ) : (
+              <div />
             )}
           </motion.div>
         )}
