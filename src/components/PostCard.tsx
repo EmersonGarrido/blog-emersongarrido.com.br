@@ -47,9 +47,14 @@ export default function PostCard({ post, index }: PostCardProps) {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Link href="/" className="font-semibold text-[15px] hover:underline">emersongarrido</Link>
-            <span className="text-neutral-500 text-[15px]">{formatDate(post.date)}</span>
+            <span className="text-neutral-500 text-[15px]">
+              {formatDate(post.date)}
+              {post.readingTime && (
+                <span> · {post.readingTime} min</span>
+              )}
+            </span>
           </div>
 
           {/* Card com conteúdo - link to post */}

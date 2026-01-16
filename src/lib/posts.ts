@@ -15,6 +15,14 @@ export interface Post {
   categories?: string[]
   content: string
   contentHtml?: string
+  readingTime?: number
+}
+
+export function calculateReadingTime(content: string): number {
+  const wordsPerMinute = 200
+  const words = content.trim().split(/\s+/).length
+  const minutes = Math.ceil(words / wordsPerMinute)
+  return minutes < 1 ? 1 : minutes
 }
 
 export function getAllPosts(): Post[] {
@@ -39,6 +47,7 @@ export function getAllPosts(): Post[] {
         image: data.image,
         categories: data.categories || [],
         content,
+        readingTime: calculateReadingTime(content),
       }
     })
 
@@ -63,6 +72,7 @@ export function getPostBySlug(slug: string): Post | null {
     image: data.image,
     categories: data.categories || [],
     content,
+    readingTime: calculateReadingTime(content),
   }
 }
 

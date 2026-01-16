@@ -72,7 +72,12 @@ export default function PostContent({ post, contentHtml, formattedDate, newerPos
               transition={{ duration: 0.3, delay: 0.3 }}
             >
               <Link href="/" className="font-semibold text-[15px] hover:underline">emersongarrido</Link>
-              <p className="text-neutral-500 text-sm">{formattedDate}</p>
+              <p className="text-neutral-500 text-sm">
+                {formattedDate}
+                {post.readingTime && (
+                  <span> · {post.readingTime} min {locale === 'en' ? 'read' : 'de leitura'}</span>
+                )}
+              </p>
             </motion.div>
           </div>
 
