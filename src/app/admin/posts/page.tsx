@@ -21,6 +21,7 @@ interface Post {
   published_at: string | null
   created_at: string
   categories: Category[]
+  views_count: number
   likes_count: number
   comments_count: number
 }
@@ -222,6 +223,7 @@ export default function AdminPostsPage() {
                 <tr className="border-b border-white/10 text-left text-white/40 text-sm">
                   <th className="px-4 py-3 font-medium">Título</th>
                   <th className="px-4 py-3 font-medium hidden md:table-cell">Categorias</th>
+                  <th className="px-4 py-3 font-medium hidden lg:table-cell text-center">Views</th>
                   <th className="px-4 py-3 font-medium hidden lg:table-cell text-center">Likes</th>
                   <th className="px-4 py-3 font-medium hidden lg:table-cell text-center">Coment.</th>
                   <th className="px-4 py-3 font-medium hidden sm:table-cell">Data</th>
@@ -255,6 +257,19 @@ export default function AdminPostsPage() {
                             </span>
                           ))}
                         </div>
+                      </td>
+                      <td className="px-4 py-3 hidden lg:table-cell text-center">
+                        {post.views_count > 0 ? (
+                          <span className="text-blue-400 text-sm flex items-center justify-center gap-1">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            {post.views_count}
+                          </span>
+                        ) : (
+                          <span className="text-white/20 text-sm">-</span>
+                        )}
                       </td>
                       <td className="px-4 py-3 hidden lg:table-cell text-center">
                         {post.likes_count > 0 ? (
