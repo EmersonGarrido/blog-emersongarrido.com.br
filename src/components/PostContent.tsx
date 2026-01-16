@@ -9,6 +9,8 @@ import { formatDateByLocale } from '@/lib/i18n'
 import ThemeToggle from '@/components/ThemeToggle'
 import HeartReaction from '@/components/HeartReaction'
 import ShareButton from '@/components/ShareButton'
+import Analytics from '@/components/Analytics'
+import Comments from '@/components/Comments'
 import type { Post } from '@/lib/posts'
 
 interface PostContentProps {
@@ -46,6 +48,7 @@ export default function PostContent({ post, contentHtml, formattedDate, newerPos
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
+      <Analytics pageType="post" slug={post.slug} />
       {/* Barra de progresso de leitura */}
       <motion.div
         className="fixed top-0 left-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 z-[60]"
@@ -193,6 +196,9 @@ export default function PostContent({ post, contentHtml, formattedDate, newerPos
                 }}
               />
             </div>
+
+            {/* Comments */}
+            <Comments postSlug={post.slug} />
           </motion.div>
         </motion.article>
 

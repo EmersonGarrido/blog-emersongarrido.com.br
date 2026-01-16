@@ -82,6 +82,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/avatar.jpg" />
+        <link rel="alternate" type="application/rss+xml" title="Emerson Garrido RSS Feed" href="/feed.xml" />
         <meta name="theme-color" content="#000000" />
       </head>
       <body className={`${inter.variable} ${lora.variable} font-sans min-h-screen`}>

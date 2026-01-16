@@ -8,6 +8,7 @@ import { useLocale } from '@/contexts/LocaleContext'
 import ThemeToggle from '@/components/ThemeToggle'
 import HeartReaction from '@/components/HeartReaction'
 import ShareButton from '@/components/ShareButton'
+import Analytics from '@/components/Analytics'
 
 export default function SobrePage() {
   const { locale } = useLocale()
@@ -23,6 +24,7 @@ export default function SobrePage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
+      <Analytics pageType="about" slug="sobre" />
       {/* Toast de link copiado */}
       <AnimatePresence>
         {copied && (
