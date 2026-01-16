@@ -100,7 +100,7 @@ export default function AdminPostsPage() {
           excerpt: post.excerpt,
           content: post.content,
           published: !post.published,
-          categories: post.categories.map(c => c.id)
+          categories: Array.isArray(post.categories) ? post.categories.map(c => c.id) : []
         })
       })
       if (res.ok) {
@@ -245,7 +245,7 @@ export default function AdminPostsPage() {
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell">
                         <div className="flex flex-wrap gap-1">
-                          {post.categories.map((cat) => (
+                          {Array.isArray(post.categories) && post.categories.map((cat) => (
                             <span key={cat.id} className="text-xs px-2 py-0.5 bg-white/10 rounded-full">
                               {cat.name}
                             </span>

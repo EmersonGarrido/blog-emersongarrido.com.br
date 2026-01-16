@@ -55,7 +55,7 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
         setExcerpt(postData.post.excerpt || '')
         setContent(postData.post.content)
         setPublished(postData.post.published)
-        setSelectedCategories(postData.post.categories?.map((c: Category) => c.id) || [])
+        setSelectedCategories(Array.isArray(postData.post.categories) ? postData.post.categories.map((c: Category) => c.id) : [])
       }
 
       setCategories(categoriesData.categories || [])
