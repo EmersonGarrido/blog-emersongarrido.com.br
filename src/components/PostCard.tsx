@@ -59,7 +59,7 @@ export default function PostCard({ post, index }: PostCardProps) {
             </div>
 
             {/* Card com conteúdo */}
-            <div className="mt-2 bg-neutral-900 rounded-2xl p-4 hover:bg-neutral-800 transition-colors">
+            <div className="mt-2 bg-neutral-900 rounded-2xl p-4 hover:bg-neutral-800 active:bg-neutral-700 transition-colors">
               <p className="text-[15px] text-neutral-300 leading-relaxed">
                 {post.excerpt}
               </p>
