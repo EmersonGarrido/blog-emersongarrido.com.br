@@ -1,6 +1,6 @@
 ---
 title: "Ensinando meu filho a programar"
-date: "2026-01-15T22:30:00"
+date: "2026-01-15T22:30:00-04:00"
 excerpt: "Na verdade, tô tentando ocupar minha cabeça. A depressão tá cada vez pior e tive mais um burnout agora em janeiro."
 ---
 

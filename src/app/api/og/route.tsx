@@ -67,11 +67,12 @@ export async function GET(request: NextRequest) {
         >
           <h1
             style={{
-              fontSize: '52px',
+              fontSize: '58px',
               color: '#fff',
-              fontWeight: 800,
-              lineHeight: 1.2,
-              marginBottom: '20px',
+              fontWeight: 900,
+              lineHeight: 1.1,
+              marginBottom: '24px',
+              letterSpacing: '-0.02em',
             }}
           >
             {title}

@@ -128,6 +128,22 @@ export default function HomeContent({ posts }: HomeContentProps) {
             {t.age}. {t.bio}
           </motion.p>
 
+          {/* Flags */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.45 }}
+            className="mt-3 flex items-center gap-2 flex-wrap"
+          >
+            <span className="text-lg" title="Brasil">🇧🇷</span>
+            <span className="text-xs px-2 py-1 bg-neutral-800 rounded-full text-neutral-400">MS</span>
+            <span className="text-xs px-2 py-1 bg-neutral-800 rounded-full text-neutral-400">DF</span>
+            <span className="text-xs px-2 py-1 bg-neutral-800 rounded-full text-neutral-400">RJ</span>
+            <span className="text-xs px-2 py-1 bg-neutral-800 rounded-full text-neutral-400">AM</span>
+            <span className="text-xs px-2 py-1 bg-neutral-800 rounded-full text-neutral-400">MT</span>
+            <span className="text-xs px-2 py-1 bg-neutral-800 rounded-full text-neutral-400">SP</span>
+          </motion.div>
+
           {/* Stats + WhatsApp */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
