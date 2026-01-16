@@ -50,26 +50,28 @@ export default function PostContent({ post, contentHtml, formattedDate, newerPos
         >
           {/* Author Header */}
           <div className="px-4 pt-4 pb-3 flex items-center gap-3">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, delay: 0.2 }}
-              className="w-10 h-10 rounded-full overflow-hidden"
-            >
-              <Image
-                src="/avatar.jpg"
-                alt="Emerson Garrido"
-                width={40}
-                height={40}
-                className="w-full h-full object-cover"
-              />
-            </motion.div>
+            <Link href="/">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: 0.2 }}
+                className="w-10 h-10 rounded-full overflow-hidden hover:ring-2 hover:ring-neutral-700 transition-all"
+              >
+                <Image
+                  src="/avatar.jpg"
+                  alt="Emerson Garrido"
+                  width={40}
+                  height={40}
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
+            </Link>
             <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3, delay: 0.3 }}
             >
-              <p className="font-semibold text-[15px]">emersongarrido</p>
+              <Link href="/" className="font-semibold text-[15px] hover:underline">emersongarrido</Link>
               <p className="text-neutral-500 text-sm">{formattedDate}</p>
             </motion.div>
           </div>

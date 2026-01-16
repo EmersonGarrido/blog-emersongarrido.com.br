@@ -31,35 +31,33 @@ export default function PostCard({ post, index }: PostCardProps) {
       transition={{ duration: 0.4, delay: index * 0.1 }}
       className="px-4 py-3"
     >
-      <Link href={`/post/${post.slug}`} className="block">
-        <motion.div
-          className="flex gap-3"
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.99 }}
-          transition={{ duration: 0.2 }}
-        >
-          {/* Avatar */}
-          <div className="flex-shrink-0">
-            <div className="w-10 h-10 rounded-full overflow-hidden">
-              <Image
-                src="/avatar.jpg"
-                alt="Emerson Garrido"
-                width={40}
-                height={40}
-                className="w-full h-full object-cover"
-              />
-            </div>
+      <div className="flex gap-3">
+        {/* Avatar - link to home */}
+        <Link href="/" className="flex-shrink-0">
+          <div className="w-10 h-10 rounded-full overflow-hidden hover:ring-2 hover:ring-neutral-700 transition-all">
+            <Image
+              src="/avatar.jpg"
+              alt="Emerson Garrido"
+              width={40}
+              height={40}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </Link>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <Link href="/" className="font-semibold text-[15px] hover:underline">emersongarrido</Link>
+            <span className="text-neutral-500 text-[15px]">{formatDate(post.date)}</span>
           </div>
 
-          {/* Content */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-[15px]">emersongarrido</span>
-              <span className="text-neutral-500 text-[15px]">{formatDate(post.date)}</span>
-            </div>
-
-            {/* Card com conteúdo */}
-            <div className="mt-2 bg-neutral-900 rounded-2xl p-4 hover:bg-neutral-800 active:bg-neutral-700 transition-colors">
+          {/* Card com conteúdo - link to post */}
+          <Link href={`/post/${post.slug}`}>
+            <motion.div
+              className="mt-2 bg-neutral-900 rounded-2xl p-4 hover:bg-neutral-800 active:bg-neutral-700 transition-colors"
+              whileTap={{ scale: 0.99 }}
+            >
               <p className="text-[15px] text-neutral-300 leading-relaxed">
                 {post.excerpt}
               </p>
@@ -69,10 +67,10 @@ export default function PostCard({ post, index }: PostCardProps) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
-            </div>
-          </div>
-        </motion.div>
-      </Link>
+            </motion.div>
+          </Link>
+        </div>
+      </div>
     </motion.article>
   )
 }
