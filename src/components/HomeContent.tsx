@@ -134,19 +134,17 @@ export default function HomeContent({ posts }: HomeContentProps) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.45 }}
-            className="mt-4 p-3 border border-neutral-800 rounded-xl"
+            className="mt-3 flex items-center gap-2 text-neutral-600 text-sm"
           >
-            <span className="flex items-center gap-2 text-neutral-500 text-sm mb-2">
-              From <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/22px-Flag_of_Brazil.svg.png" alt="Brasil" title="Brasil" className="h-4 rounded-sm" />
-            </span>
-            <div className="flex items-center gap-3">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Bandeira_de_Mato_Grosso_do_Sul.svg/23px-Bandeira_de_Mato_Grosso_do_Sul.svg.png" alt="MS" title="Mato Grosso do Sul" className="h-4 rounded-sm" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Bandeira_do_Distrito_Federal_%28Brasil%29.svg/23px-Bandeira_do_Distrito_Federal_%28Brasil%29.svg.png" alt="DF" title="Distrito Federal" className="h-4 rounded-sm" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Bandeira_do_estado_do_Rio_de_Janeiro.svg/23px-Bandeira_do_estado_do_Rio_de_Janeiro.svg.png" alt="RJ" title="Rio de Janeiro" className="h-4 rounded-sm" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Bandeira_do_Amazonas.svg/23px-Bandeira_do_Amazonas.svg.png" alt="AM" title="Amazonas" className="h-4 rounded-sm" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Bandeira_de_Mato_Grosso.svg/23px-Bandeira_de_Mato_Grosso.svg.png" alt="MT" title="Mato Grosso" className="h-4 rounded-sm" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Bandeira_do_estado_de_S%C3%A3o_Paulo.svg/23px-Bandeira_do_estado_de_S%C3%A3o_Paulo.svg.png" alt="SP" title="São Paulo" className="h-4 rounded-sm" />
-            </div>
+            <span>From</span>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/18px-Flag_of_Brazil.svg.png" alt="Brasil" title="Brasil" className="h-3 rounded-sm" />
+            <span className="text-neutral-700">·</span>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Bandeira_de_Mato_Grosso_do_Sul.svg/18px-Bandeira_de_Mato_Grosso_do_Sul.svg.png" alt="MS" title="Mato Grosso do Sul" className="h-3 rounded-sm" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Bandeira_do_Distrito_Federal_%28Brasil%29.svg/18px-Bandeira_do_Distrito_Federal_%28Brasil%29.svg.png" alt="DF" title="Distrito Federal" className="h-3 rounded-sm" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Bandeira_do_estado_do_Rio_de_Janeiro.svg/18px-Bandeira_do_estado_do_Rio_de_Janeiro.svg.png" alt="RJ" title="Rio de Janeiro" className="h-3 rounded-sm" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Bandeira_do_Amazonas.svg/18px-Bandeira_do_Amazonas.svg.png" alt="AM" title="Amazonas" className="h-3 rounded-sm" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Bandeira_de_Mato_Grosso.svg/18px-Bandeira_de_Mato_Grosso.svg.png" alt="MT" title="Mato Grosso" className="h-3 rounded-sm" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Bandeira_do_estado_de_S%C3%A3o_Paulo.svg/18px-Bandeira_do_estado_de_S%C3%A3o_Paulo.svg.png" alt="SP" title="São Paulo" className="h-3 rounded-sm" />
           </motion.div>
 
           {/* Stats + WhatsApp */}
@@ -162,7 +160,7 @@ export default function HomeContent({ posts }: HomeContentProps) {
 
             <Link
               href="/sobre"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-neutral-800 hover:bg-neutral-700 active:bg-neutral-600 text-sm font-medium rounded-full transition-colors min-h-[40px]"
+              className="text-neutral-500 hover:text-white text-[15px] transition-colors"
             >
               {locale === 'en' ? 'About' : 'Sobre'}
             </Link>
