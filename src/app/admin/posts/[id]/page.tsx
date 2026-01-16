@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import RichEditor from '@/components/RichEditor'
@@ -12,8 +12,9 @@ interface Category {
   slug: string
 }
 
-export default function EditPostPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
+export default function EditPostPage() {
+  const params = useParams()
+  const id = params.id as string
   const router = useRouter()
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
@@ -27,6 +28,8 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
   const [showPreview, setShowPreview] = useState(false)
 
   useEffect(() => {
+    if (!id) return
+
     fetch('/api/admin/auth')
       .then(res => res.json())
       .then(data => {
@@ -57,16 +60,16 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
       }
 
       setCategories(categoriesData.categories || [])
-    } catch (error) {
-      console.error('Load error:', error)
+    } catch (err) {
+      console.error('Load error:', err)
       setError('Erro ao carregar post')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
     if (!title || !content) {
       setError('Título e conteúdo são obrigatórios')
       return
@@ -147,7 +150,7 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
               {showPreview ? 'Editar' : 'Preview'}
             </button>
             <button
-              onClick={handleSubmit}
+              onClick={() => handleSubmit()}
               disabled={saving}
               className="px-4 py-2 bg-white text-black rounded-lg font-medium hover:bg-white/90 transition-colors disabled:opacity-50 flex items-center gap-2"
             >
