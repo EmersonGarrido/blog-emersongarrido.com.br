@@ -11,6 +11,27 @@
 html {
   scroll-behavior: smooth;
   overflow-y: scroll;
+  scrollbar-width: thin;
+  scrollbar-color: #333 #000;
+}
+
+/* Scrollbar - Webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
 }
 
 body {
