@@ -125,13 +125,13 @@ export default function PostCard({ post, index }: PostCardProps) {
                   {post.excerpt}
                 </p>
                 {post.categories && post.categories.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-1.5">
+                  <div className="mt-3 flex flex-wrap gap-2">
                     {post.categories.map((category) => (
                       <span
                         key={category}
-                        className="text-xs px-2 py-0.5 bg-[var(--bg-tertiary)] text-[var(--text-muted)] rounded-full border border-[var(--border-color)]"
+                        className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
                       >
-                        {category}
+                        #{category.replace(/\s+/g, '')}
                       </span>
                     ))}
                   </div>
