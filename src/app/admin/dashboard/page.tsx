@@ -9,6 +9,9 @@ interface Analytics {
   summary: {
     totalViews: number
     uniqueVisitors: number
+    newVisitors: number
+    returningVisitors: number
+    totalUniqueVisitors: number
     totalLikes: number
     totalComments: number
     pendingComments: number
@@ -459,6 +462,57 @@ export default function AdminDashboard() {
                   <span className="text-white/40 text-xs">Compartilhamentos</span>
                 </div>
                 <p className="text-2xl font-bold text-white">{analytics.summary.totalShares}</p>
+              </motion.div>
+            </div>
+
+            {/* Visitor Breakdown */}
+            <div className="grid grid-cols-3 gap-4">
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border border-emerald-500/20 rounded-2xl p-4"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 shrink-0 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
+                  </div>
+                  <span className="text-white/40 text-xs">Novos</span>
+                </div>
+                <p className="text-2xl font-bold text-emerald-400">{analytics.summary.newVisitors}</p>
+                <p className="text-xs text-white/30 mt-1">primeira visita no período</p>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 border border-amber-500/20 rounded-2xl p-4"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 shrink-0 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  </div>
+                  <span className="text-white/40 text-xs">Recorrentes</span>
+                </div>
+                <p className="text-2xl font-bold text-amber-400">{analytics.summary.returningVisitors}</p>
+                <p className="text-xs text-white/30 mt-1">voltaram no período</p>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                className="bg-gradient-to-br from-violet-500/10 to-violet-600/5 border border-violet-500/20 rounded-2xl p-4"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 shrink-0 rounded-lg bg-violet-500/20 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                  <span className="text-white/40 text-xs">Total Únicos</span>
+                </div>
+                <p className="text-2xl font-bold text-violet-400">{analytics.summary.totalUniqueVisitors}</p>
+                <p className="text-xs text-white/30 mt-1">desde o início</p>
               </motion.div>
             </div>
 
