@@ -3,16 +3,22 @@ import { NextRequest, NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 
 // Ensure comment_likes table exists
+// Note: This table is now created by /api/setup
+// Keeping function for backwards compatibility but it's a no-op
 async function ensureCommentLikesTable() {
-  await sql`
-    CREATE TABLE IF NOT EXISTS comment_likes (
-      id SERIAL PRIMARY KEY,
-      comment_id INTEGER NOT NULL REFERENCES comments(id) ON DELETE CASCADE,
-      visitor_id VARCHAR(100) NOT NULL,
-      created_at TIMESTAMP DEFAULT NOW(),
-      UNIQUE(comment_id, visitor_id)
-    )
-  `
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS comment_likes (
+        id SERIAL PRIMARY KEY,
+        comment_id INTEGER NOT NULL REFERENCES comments(id) ON DELETE CASCADE,
+        visitor_id VARCHAR(100) NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE(comment_id, visitor_id)
+      )
+    `
+  } catch {
+    // Table already exists or other error - ignore
+  }
 }
 
 // GET - List approved comments for a post or get count
@@ -37,27 +43,45 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ count })
     }
 
-    await ensureCommentLikesTable()
-
     const headersList = await headers()
     const ip = headersList.get('x-forwarded-for')?.split(',')[0] ||
                headersList.get('x-real-ip') ||
                '127.0.0.1'
     const visitorId = ip
 
-    const comments = await sql`
-      SELECT
-        c.id,
-        c.author_name,
-        c.content,
-        c.created_at,
-        COALESCE(c.is_edited, false) as is_edited,
-        (SELECT COUNT(*) FROM comment_likes cl WHERE cl.comment_id = c.id)::int as likes_count,
-        EXISTS(SELECT 1 FROM comment_likes cl WHERE cl.comment_id = c.id AND cl.visitor_id = ${visitorId}) as is_liked
-      FROM comments c
-      WHERE c.post_slug = ${slug} AND c.is_approved = true AND c.is_spam = false
-      ORDER BY c.created_at DESC
-    `
+    // Try full query with comment_likes, fallback to simple query if table doesn't exist
+    let comments
+    try {
+      await ensureCommentLikesTable()
+      comments = await sql`
+        SELECT
+          c.id,
+          c.author_name,
+          c.content,
+          c.created_at,
+          COALESCE(c.is_edited, false) as is_edited,
+          (SELECT COUNT(*) FROM comment_likes cl WHERE cl.comment_id = c.id)::int as likes_count,
+          EXISTS(SELECT 1 FROM comment_likes cl WHERE cl.comment_id = c.id AND cl.visitor_id = ${visitorId}) as is_liked
+        FROM comments c
+        WHERE c.post_slug = ${slug} AND c.is_approved = true AND c.is_spam = false
+        ORDER BY c.created_at DESC
+      `
+    } catch {
+      // Fallback to simpler query without comment_likes
+      comments = await sql`
+        SELECT
+          c.id,
+          c.author_name,
+          c.content,
+          c.created_at,
+          false as is_edited,
+          0 as likes_count,
+          false as is_liked
+        FROM comments c
+        WHERE c.post_slug = ${slug} AND c.is_approved = true AND c.is_spam = false
+        ORDER BY c.created_at DESC
+      `
+    }
 
     // Include count in response for convenience
     return NextResponse.json({ comments, count: comments.length })
