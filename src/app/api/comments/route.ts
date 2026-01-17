@@ -15,16 +15,28 @@ async function ensureCommentLikesTable() {
   `
 }
 
-// GET - List approved comments for a post
+// GET - List approved comments for a post or get count
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const slug = searchParams.get('slug')
+  const countOnly = searchParams.get('count') === 'true'
 
   if (!slug) {
     return NextResponse.json({ error: 'Slug is required' }, { status: 400 })
   }
 
   try {
+    // If only count is needed, return just the count (more efficient)
+    if (countOnly) {
+      const result = await sql`
+        SELECT COUNT(*) as count
+        FROM comments
+        WHERE post_slug = ${slug} AND is_approved = true AND is_spam = false
+      `
+      const count = parseInt(result[0].count as string) || 0
+      return NextResponse.json({ count })
+    }
+
     await ensureCommentLikesTable()
 
     const headersList = await headers()
@@ -47,7 +59,8 @@ export async function GET(request: NextRequest) {
       ORDER BY c.created_at DESC
     `
 
-    return NextResponse.json({ comments })
+    // Include count in response for convenience
+    return NextResponse.json({ comments, count: comments.length })
   } catch (error) {
     console.error('Get comments error:', error)
     return NextResponse.json({ error: 'Failed to get comments' }, { status: 500 })

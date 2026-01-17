@@ -38,11 +38,11 @@ export default function PostCard({ post, index }: PostCardProps) {
       })
       .catch(() => {})
 
-    // Fetch comments count
-    fetch(`/api/comments?slug=${encodeURIComponent(post.slug)}`)
+    // Fetch comments count (using count endpoint for efficiency)
+    fetch(`/api/comments?slug=${encodeURIComponent(post.slug)}&count=true`)
       .then(res => res.json())
-      .then(data => setCommentsCount(data.comments?.length || 0))
-      .catch(() => {})
+      .then(data => setCommentsCount(data.count || 0))
+      .catch(err => console.error('Comments count error:', err))
 
     // Fetch shares count
     fetch(`/api/shares?slug=${encodeURIComponent(post.slug)}`)
