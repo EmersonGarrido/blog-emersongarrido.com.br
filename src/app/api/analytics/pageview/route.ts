@@ -2,8 +2,8 @@ import { sql } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 
-// Generate visitor ID from IP + User Agent
-function getVisitorId(ip: string, userAgent: string): string {
+// Generate fallback visitor ID from IP + User Agent (for clients without localStorage)
+function generateFallbackVisitorId(ip: string, userAgent: string): string {
   const data = `${ip}-${userAgent}`
   let hash = 0
   for (let i = 0; i < data.length; i++) {
@@ -11,7 +11,7 @@ function getVisitorId(ip: string, userAgent: string): string {
     hash = ((hash << 5) - hash) + char
     hash = hash & hash
   }
-  return Math.abs(hash).toString(36)
+  return 'fallback-' + Math.abs(hash).toString(36)
 }
 
 // Detect source from UTM params or referrer
@@ -37,14 +37,16 @@ function detectSource(utmSource: string | null, referrer: string | null): string
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { slug, pageType, utmSource, utmMedium, utmCampaign, referrer } = body
+    const { slug, pageType, visitorId: clientVisitorId, isNewVisitor, utmSource, utmMedium, utmCampaign, referrer } = body
 
     const headersList = await headers()
     const ip = headersList.get('x-forwarded-for')?.split(',')[0] ||
                headersList.get('x-real-ip') ||
                '127.0.0.1'
     const userAgent = headersList.get('user-agent') || ''
-    const visitorId = getVisitorId(ip, userAgent)
+
+    // Use client-provided visitor ID (localStorage) or fallback to IP+UA hash
+    const visitorId = clientVisitorId || generateFallbackVisitorId(ip, userAgent)
 
     // Detect source
     const source = detectSource(utmSource, referrer)
@@ -67,6 +69,44 @@ export async function POST(request: NextRequest) {
       }
     } catch {
       // Ignore geolocation errors
+    }
+
+    // Ensure visitors table exists
+    await sql`
+      CREATE TABLE IF NOT EXISTS visitors (
+        id SERIAL PRIMARY KEY,
+        visitor_id VARCHAR(100) UNIQUE NOT NULL,
+        first_seen TIMESTAMP DEFAULT NOW(),
+        last_seen TIMESTAMP DEFAULT NOW(),
+        visit_count INTEGER DEFAULT 1,
+        country VARCHAR(100),
+        city VARCHAR(100)
+      )
+    `
+
+    // Track visitor (upsert)
+    if (isNewVisitor) {
+      // New visitor - insert
+      await sql`
+        INSERT INTO visitors (visitor_id, country, city)
+        VALUES (${visitorId}, ${country}, ${city})
+        ON CONFLICT (visitor_id) DO UPDATE SET
+          last_seen = NOW(),
+          visit_count = visitors.visit_count + 1,
+          country = COALESCE(${country}, visitors.country),
+          city = COALESCE(${city}, visitors.city)
+      `
+    } else {
+      // Returning visitor - update
+      await sql`
+        INSERT INTO visitors (visitor_id, country, city)
+        VALUES (${visitorId}, ${country}, ${city})
+        ON CONFLICT (visitor_id) DO UPDATE SET
+          last_seen = NOW(),
+          visit_count = visitors.visit_count + 1,
+          country = COALESCE(${country}, visitors.country),
+          city = COALESCE(${city}, visitors.city)
+      `
     }
 
     // Insert page view

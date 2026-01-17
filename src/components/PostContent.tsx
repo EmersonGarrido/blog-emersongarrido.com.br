@@ -24,7 +24,6 @@ interface PostContentProps {
 export default function PostContent({ post, contentHtml, formattedDate, newerPost, olderPost }: PostContentProps) {
   const { t, locale } = useLocale()
   const [readingProgress, setReadingProgress] = useState(0)
-  const [copied, setCopied] = useState(false)
 
   // Barra de progresso de leitura
   useEffect(() => {
@@ -56,23 +55,6 @@ export default function PostContent({ post, contentHtml, formattedDate, newerPos
         initial={{ opacity: 0 }}
         animate={{ opacity: readingProgress > 0 ? 1 : 0 }}
       />
-
-      {/* Toast de link copiado */}
-      <AnimatePresence>
-        {copied && (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] bg-[var(--bg-tertiary)] text-[var(--text-primary)] px-4 py-2 rounded-full text-sm flex items-center gap-2 shadow-lg"
-          >
-            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            {locale === 'en' ? 'Link copied!' : 'Link copiado!'}
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Header */}
       <motion.header
@@ -190,10 +172,7 @@ export default function PostContent({ post, contentHtml, formattedDate, newerPos
               <ShareButton
                 url={postUrl}
                 text={shareText}
-                onCopied={() => {
-                  setCopied(true)
-                  setTimeout(() => setCopied(false), 2000)
-                }}
+                slug={post.slug}
               />
             </div>
 

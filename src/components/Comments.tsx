@@ -124,13 +124,20 @@ export default function Comments({ postSlug }: CommentsProps) {
       {!showForm && (
         <button
           onClick={() => setShowForm(true)}
-          className="w-full flex items-center justify-center gap-2 py-3 text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors text-sm"
+          className="w-full flex flex-col items-center justify-center gap-1 py-3 text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
-          {locale === 'en' ? 'Add a comment' : 'Comentar'}
-          {comments.length > 0 && ` (${comments.length})`}
+          <div className="flex items-center gap-2 text-sm">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            {locale === 'en' ? 'Add a comment' : 'Comentar'}
+            {comments.length > 0 && ` (${comments.length})`}
+          </div>
+          {comments.length === 0 && !loading && (
+            <span className="text-xs text-[var(--text-muted)]/60">
+              {locale === 'en' ? 'No comments yet. Be the first!' : 'Nenhum comentário ainda. Seja o primeiro!'}
+            </span>
+          )}
         </button>
       )}
 

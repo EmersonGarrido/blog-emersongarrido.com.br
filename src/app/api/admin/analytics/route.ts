@@ -33,6 +33,57 @@ export async function GET(request: NextRequest) {
     `
     const uniqueVisitors = parseInt(uniqueVisitorsResult[0].count as string) || 0
 
+    // Ensure visitors table exists for new metrics
+    await sql`
+      CREATE TABLE IF NOT EXISTS visitors (
+        id SERIAL PRIMARY KEY,
+        visitor_id VARCHAR(100) UNIQUE NOT NULL,
+        first_seen TIMESTAMP DEFAULT NOW(),
+        last_seen TIMESTAMP DEFAULT NOW(),
+        visit_count INTEGER DEFAULT 1,
+        country VARCHAR(100),
+        city VARCHAR(100)
+      )
+    `
+
+    // New visitors (first_seen within period)
+    let newVisitorsDateFilter = ''
+    if (period === 'today') {
+      newVisitorsDateFilter = `WHERE first_seen > NOW() - INTERVAL '1 day'`
+    } else if (period === '7d') {
+      newVisitorsDateFilter = `WHERE first_seen > NOW() - INTERVAL '7 days'`
+    } else if (period === '30d') {
+      newVisitorsDateFilter = `WHERE first_seen > NOW() - INTERVAL '30 days'`
+    }
+
+    const newVisitorsResult = await sql`
+      SELECT COUNT(*) as count FROM visitors ${sql.unsafe(newVisitorsDateFilter || 'WHERE 1=1')}
+    `
+    const newVisitors = parseInt(newVisitorsResult[0].count as string) || 0
+
+    // Returning visitors (first_seen before period, but visited during period)
+    let returningVisitorsQuery = ''
+    if (period === 'today') {
+      returningVisitorsQuery = `WHERE first_seen < NOW() - INTERVAL '1 day' AND last_seen > NOW() - INTERVAL '1 day'`
+    } else if (period === '7d') {
+      returningVisitorsQuery = `WHERE first_seen < NOW() - INTERVAL '7 days' AND last_seen > NOW() - INTERVAL '7 days'`
+    } else if (period === '30d') {
+      returningVisitorsQuery = `WHERE first_seen < NOW() - INTERVAL '30 days' AND last_seen > NOW() - INTERVAL '30 days'`
+    } else {
+      returningVisitorsQuery = `WHERE visit_count > 1`
+    }
+
+    const returningVisitorsResult = await sql`
+      SELECT COUNT(*) as count FROM visitors ${sql.unsafe(returningVisitorsQuery)}
+    `
+    const returningVisitors = parseInt(returningVisitorsResult[0].count as string) || 0
+
+    // Total unique visitors (all time)
+    const totalUniqueVisitorsResult = await sql`
+      SELECT COUNT(*) as count FROM visitors
+    `
+    const totalUniqueVisitors = parseInt(totalUniqueVisitorsResult[0].count as string) || 0
+
     // Total likes
     const totalLikesResult = await sql`
       SELECT COUNT(*) as count FROM likes
@@ -261,6 +312,9 @@ export async function GET(request: NextRequest) {
       summary: {
         totalViews,
         uniqueVisitors,
+        newVisitors,
+        returningVisitors,
+        totalUniqueVisitors,
         totalLikes,
         totalComments,
         pendingComments,
