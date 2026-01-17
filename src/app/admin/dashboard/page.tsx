@@ -555,7 +555,7 @@ export default function AdminDashboard() {
                       className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full text-xs"
                     >
                       <span className="text-white/60">
-                        {user.page === 'home' ? 'Principal' : user.page}
+                        {user.page === 'home' ? 'Feed' : user.page}
                       </span>
                       {user.city && (
                         <span className="text-white/30">
@@ -588,7 +588,7 @@ export default function AdminDashboard() {
                           rel="noopener noreferrer"
                           className="text-white/60 hover:text-white truncate flex-1 transition-colors"
                         >
-                          {page.page_type === 'home' ? 'Home' : page.page}
+                          {page.page_type === 'home' ? 'Feed' : page.page}
                         </a>
                         <span className="text-white/40 ml-2">{page.views}</span>
                       </div>
@@ -885,7 +885,7 @@ export default function AdminDashboard() {
                               rel="noopener noreferrer"
                               className="hover:text-white transition-colors"
                             >
-                              {view.page_type === 'home' ? 'Principal' : view.post_slug || view.page_type}
+                              {view.page_type === 'home' ? 'Feed' : view.post_slug || view.page_type}
                             </a>
                           </td>
                           <td className="py-3">

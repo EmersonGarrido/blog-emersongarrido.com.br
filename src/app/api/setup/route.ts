@@ -136,6 +136,23 @@ export async function GET() {
       )
     `
 
+    // Create post_revisions table for edit history
+    await sql`
+      CREATE TABLE IF NOT EXISTS post_revisions (
+        id SERIAL PRIMARY KEY,
+        post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+        title VARCHAR(255) NOT NULL,
+        excerpt TEXT,
+        content TEXT NOT NULL,
+        edited_by VARCHAR(50) DEFAULT 'user',
+        revision_note TEXT,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `
+
+    await sql`CREATE INDEX IF NOT EXISTS idx_revisions_post_id ON post_revisions(post_id)`
+    await sql`CREATE INDEX IF NOT EXISTS idx_revisions_created_at ON post_revisions(created_at)`
+
     // Mark all published posts as reviewed by AI
     await sql`
       UPDATE posts SET ai_reviewed = true WHERE published = true AND ai_reviewed = false

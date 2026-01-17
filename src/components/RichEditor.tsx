@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import PostLinkModal from './PostLinkModal'
 
 interface RichEditorProps {
   content: string
@@ -8,9 +9,19 @@ interface RichEditorProps {
   placeholder?: string
 }
 
+interface Post {
+  id: number
+  slug: string
+  title: string
+  excerpt: string
+  published: boolean
+}
+
 export default function RichEditor({ content, onChange, placeholder }: RichEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [showHelp, setShowHelp] = useState(false)
+  const [showPostLinkModal, setShowPostLinkModal] = useState(false)
+  const [showAlignMenu, setShowAlignMenu] = useState(false)
 
   const insertFormat = (before: string, after: string = '') => {
     const textarea = textareaRef.current
@@ -45,6 +56,54 @@ export default function RichEditor({ content, onChange, placeholder }: RichEdito
       textarea.focus()
       textarea.setSelectionRange(start + prefix.length, start + prefix.length)
     }, 0)
+  }
+
+  const insertText = (text: string) => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const newText = content.substring(0, start) + text + content.substring(end)
+
+    onChange(newText)
+
+    setTimeout(() => {
+      textarea.focus()
+      const newPos = start + text.length
+      textarea.setSelectionRange(newPos, newPos)
+    }, 0)
+  }
+
+  const handlePostSelect = (post: Post, type: 'card' | 'link') => {
+    if (type === 'card') {
+      insertText(`\n::post-link[${post.slug}]\n`)
+    } else {
+      insertText(`[${post.title}](/post/${post.slug})`)
+    }
+    setShowPostLinkModal(false)
+  }
+
+  const insertTable = () => {
+    const tableTemplate = `
+| Coluna 1 | Coluna 2 | Coluna 3 |
+|----------|----------|----------|
+| Dado 1   | Dado 2   | Dado 3   |
+| Dado 4   | Dado 5   | Dado 6   |
+`
+    insertText(tableTemplate)
+  }
+
+  const insertAlignment = (align: 'left' | 'center' | 'right') => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const selectedText = content.substring(start, end) || 'Texto aqui'
+
+    insertText(`::${align}[${selectedText}]`)
+    setShowAlignMenu(false)
   }
 
   return (
@@ -110,6 +169,60 @@ export default function RichEditor({ content, onChange, placeholder }: RichEdito
           </svg>
         </ToolButton>
 
+        <div className="w-px h-6 bg-white/10 mx-1" />
+
+        {/* Alignment dropdown */}
+        <div className="relative">
+          <ToolButton onClick={() => setShowAlignMenu(!showAlignMenu)} title="Alinhamento">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </ToolButton>
+          {showAlignMenu && (
+            <div className="absolute top-full left-0 mt-1 bg-[#1a1a1b] border border-white/10 rounded-lg shadow-xl z-10 py-1 min-w-[120px]">
+              <button
+                onClick={() => insertAlignment('left')}
+                className="w-full px-3 py-1.5 text-left text-sm text-white/70 hover:bg-white/10 flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h10M4 18h14" />
+                </svg>
+                Esquerda
+              </button>
+              <button
+                onClick={() => insertAlignment('center')}
+                className="w-full px-3 py-1.5 text-left text-sm text-white/70 hover:bg-white/10 flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M7 12h10M5 18h14" />
+                </svg>
+                Centro
+              </button>
+              <button
+                onClick={() => insertAlignment('right')}
+                className="w-full px-3 py-1.5 text-left text-sm text-white/70 hover:bg-white/10 flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M10 12h10M6 18h14" />
+                </svg>
+                Direita
+              </button>
+            </div>
+          )}
+        </div>
+
+        <ToolButton onClick={insertTable} title="Tabela">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M3 14h18M10 3v18M14 3v18M3 6a3 3 0 013-3h12a3 3 0 013 3v12a3 3 0 01-3 3H6a3 3 0 01-3-3V6z" />
+          </svg>
+        </ToolButton>
+
+        <ToolButton onClick={() => setShowPostLinkModal(true)} title="Linkar Post">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+          </svg>
+        </ToolButton>
+
         <div className="flex-1" />
 
         <ToolButton onClick={() => setShowHelp(!showHelp)} title="Ajuda Markdown">
@@ -125,10 +238,12 @@ export default function RichEditor({ content, onChange, placeholder }: RichEdito
           <div className="grid grid-cols-2 gap-2">
             <div><code className="bg-white/10 px-1 rounded">**texto**</code> = <strong>negrito</strong></div>
             <div><code className="bg-white/10 px-1 rounded">*texto*</code> = <em>itálico</em></div>
-            <div><code className="bg-white/10 px-1 rounded"># Título</code> = Título H1</div>
+            <div><code className="bg-white/10 px-1 rounded"># Titulo</code> = Titulo H1</div>
             <div><code className="bg-white/10 px-1 rounded">- item</code> = Lista</div>
-            <div><code className="bg-white/10 px-1 rounded">{'>'}citação</code> = Citação</div>
+            <div><code className="bg-white/10 px-1 rounded">{'>'}citacao</code> = Citacao</div>
             <div><code className="bg-white/10 px-1 rounded">[texto](url)</code> = Link</div>
+            <div><code className="bg-white/10 px-1 rounded">::center[texto]</code> = Centralizado</div>
+            <div><code className="bg-white/10 px-1 rounded">::post-link[slug]</code> = Card de post</div>
           </div>
         </div>
       )}
@@ -146,6 +261,13 @@ export default function RichEditor({ content, onChange, placeholder }: RichEdito
       <div className="px-4 py-2 border-t border-white/10 text-xs text-white/30">
         {content.length} caracteres
       </div>
+
+      {/* Post Link Modal */}
+      <PostLinkModal
+        isOpen={showPostLinkModal}
+        onClose={() => setShowPostLinkModal(false)}
+        onSelect={handlePostSelect}
+      />
     </div>
   )
 }

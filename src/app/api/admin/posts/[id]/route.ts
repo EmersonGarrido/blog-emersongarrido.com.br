@@ -61,16 +61,28 @@ export async function PUT(
 
   try {
     const body = await request.json()
-    const { title, excerpt, content, image, published, categories } = body
+    const { title, excerpt, content, image, published, categories, editedBy, revisionNote } = body
 
     if (!title || !content) {
       return NextResponse.json({ error: 'Title and content are required' }, { status: 400 })
     }
 
-    // Get current post
-    const current = await sql`SELECT slug, published FROM posts WHERE id = ${id}`
+    // Get current post (to save as revision before updating)
+    const current = await sql`SELECT slug, published, title, excerpt, content FROM posts WHERE id = ${id}`
     if (current.length === 0) {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+    }
+
+    // Save current version as revision before updating (if content changed)
+    const contentChanged = current[0].title !== title ||
+                           current[0].excerpt !== excerpt ||
+                           current[0].content !== content
+
+    if (contentChanged) {
+      await sql`
+        INSERT INTO post_revisions (post_id, title, excerpt, content, edited_by, revision_note)
+        VALUES (${id}, ${current[0].title}, ${current[0].excerpt || null}, ${current[0].content}, ${editedBy || 'user'}, ${revisionNote || null})
+      `
     }
 
     const newSlug = slugify(title)

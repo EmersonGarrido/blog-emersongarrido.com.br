@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import RichEditor from '@/components/RichEditor'
 import CategoryModal from '@/components/CategoryModal'
+import RevisionHistoryModal from '@/components/RevisionHistoryModal'
 
 interface Category {
   id: number
@@ -29,6 +30,7 @@ export default function EditPostPage() {
   const [showPreview, setShowPreview] = useState(false)
   const [showCategoryModal, setShowCategoryModal] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+  const [showHistoryModal, setShowHistoryModal] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -196,6 +198,17 @@ export default function EditPostPage() {
             <h1 className="text-xl font-bold">Editar Post</h1>
           </div>
           <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setShowHistoryModal(true)}
+              className="px-3 py-2 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/10 transition-all flex items-center gap-1.5"
+              title="Historico de edicoes"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Historico
+            </button>
             <button
               type="button"
               onClick={() => setShowPreview(!showPreview)}
@@ -392,6 +405,16 @@ export default function EditPostPage() {
         onSaved={handleCategorySaved}
         editCategory={editingCategory}
       />
+
+      {/* Revision History Modal */}
+      <RevisionHistoryModal
+        isOpen={showHistoryModal}
+        onClose={() => setShowHistoryModal(false)}
+        postId={id}
+        currentTitle={title}
+        currentContent={content}
+        onRestore={loadData}
+      />
     </div>
   )
 }
@@ -419,6 +442,26 @@ function markdownToHtml(markdown: string): string {
   html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>')
   html = html.replace(/~~([^~]+)~~/g, '<s>$1</s>')
 
+  // Alignments
+  html = html.replace(/::left\[([^\]]+)\]/g, '<div class="text-left">$1</div>')
+  html = html.replace(/::center\[([^\]]+)\]/g, '<div class="text-center">$1</div>')
+  html = html.replace(/::right\[([^\]]+)\]/g, '<div class="text-right">$1</div>')
+
+  // Post link card (placeholder in preview)
+  html = html.replace(/::post-link\[([^\]]+)\]/g, '<div class="p-4 border border-white/20 rounded-lg bg-white/5 my-4"><span class="text-white/40 text-sm">Post linkado: </span><span class="text-blue-400">$1</span></div>')
+
+  // Tables
+  html = html.replace(/^\|(.+)\|$/gm, (match, content) => {
+    const cells = content.split('|').map((c: string) => c.trim())
+    const isHeader = cells.every((c: string) => /^-+$/.test(c))
+    if (isHeader) return '' // Skip separator row
+    const cellTag = 'td'
+    const cellsHtml = cells.map((c: string) => `<${cellTag} class="border border-white/20 px-3 py-2">${c}</${cellTag}>`).join('')
+    return `<tr>${cellsHtml}</tr>`
+  })
+  // Wrap table rows
+  html = html.replace(/(<tr>[\s\S]*?<\/tr>\n?)+/g, '<table class="w-full border-collapse border border-white/20 my-4">$&</table>')
+
   // Links
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-400 underline">$1</a>')
 
@@ -426,7 +469,7 @@ function markdownToHtml(markdown: string): string {
   html = html.replace(/!\[\]\(([^)]+)\)/g, '<img src="$1" class="max-w-full rounded-lg" />')
 
   // Blockquotes
-  html = html.replace(/^> (.*$)/gm, '<blockquote class="border-l-4 border-white/20 pl-4 italic text-white/60">$1</blockquote>')
+  html = html.replace(/^&gt; (.*$)/gm, '<blockquote class="border-l-4 border-white/20 pl-4 italic text-white/60">$1</blockquote>')
 
   // Lists
   html = html.replace(/^- (.*$)/gm, '<li>$1</li>')
