@@ -13,11 +13,16 @@ interface Analytics {
     totalComments: number
     pendingComments: number
     onlineUsers: number
+    totalShares: number
   }
   viewsByDay: Array<{ date: string; views: number }>
   topPages: Array<{ page: string; page_type: string; views: number }>
   topPostsByLikes: Array<{ post_slug: string; likes: number }>
   topPostsByComments: Array<{ post_slug: string; comments: number }>
+  topPostsByShares: Array<{ post_slug: string; shares: number }>
+  sharesByMethod: Array<{ method: string; shares: number }>
+  recentShares: Array<{ id: number; post_slug: string; share_method: string; created_at: string }>
+  utmBreakdown: Array<{ utm_source: string; utm_medium: string | null; utm_campaign: string | null; visits: number }>
   trafficSources: Array<{ source: string; views: number }>
   countries: Array<{ country: string; views: number }>
   cities: Array<{ city: string; country: string; views: number }>
@@ -179,8 +184,8 @@ export default function AdminDashboard() {
     })
   }
 
-  const getMaxValue = (arr: Array<{ views?: number; likes?: number; comments?: number; users?: number }>) => {
-    return Math.max(...arr.map(item => item.views || item.likes || item.comments || item.users || 0), 1)
+  const getMaxValue = (arr: Array<{ views?: number; likes?: number; comments?: number; users?: number; shares?: number; visits?: number }>) => {
+    return Math.max(...arr.map(item => item.views || item.likes || item.comments || item.users || item.shares || item.visits || 0), 1)
   }
 
   const parseUserAgent = (ua: string | null): { device: string; browser: string } => {
@@ -348,7 +353,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/20 rounded-2xl p-4"
@@ -439,6 +444,21 @@ export default function AdminDashboard() {
                   <span className="text-white/40 text-xs">Pendentes</span>
                 </div>
                 <p className="text-2xl font-bold text-yellow-400">{analytics.summary.pendingComments}</p>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                className="bg-gradient-to-br from-teal-500/10 to-teal-600/5 border border-teal-500/20 rounded-2xl p-4"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 rounded-lg bg-teal-500/20 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                    </svg>
+                  </div>
+                  <span className="text-white/40 text-xs">Compartilhamentos</span>
+                </div>
+                <p className="text-2xl font-bold text-white">{analytics.summary.totalShares}</p>
               </motion.div>
             </div>
 
@@ -584,6 +604,91 @@ export default function AdminDashboard() {
                   ))}
                   {analytics.topPostsByComments.length === 0 && (
                     <p className="text-white/30 text-sm">Nenhum comentario ainda</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Top Posts by Shares */}
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                  </svg>
+                  Mais Compartilhados
+                </h3>
+                <div className="space-y-2">
+                  {analytics.topPostsByShares.map((post, i) => (
+                    <div key={i} className="group">
+                      <div className="flex items-center justify-between text-sm mb-1">
+                        <a
+                          href={`/post/${post.post_slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-white/60 hover:text-white truncate flex-1 transition-colors"
+                        >
+                          {post.post_slug}
+                        </a>
+                        <span className="text-teal-400 ml-2">{post.shares}</span>
+                      </div>
+                      <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${(post.shares / getMaxValue(analytics.topPostsByShares.map(p => ({ shares: p.shares })))) * 100}%` }}
+                          className="h-full bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  {analytics.topPostsByShares.length === 0 && (
+                    <p className="text-white/30 text-sm">Nenhum compartilhamento ainda</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Shares by Social Network */}
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                  </svg>
+                  Redes Sociais
+                </h3>
+                <div className="space-y-2">
+                  {analytics.sharesByMethod.map((item, i) => {
+                    const methodColors: Record<string, string> = {
+                      whatsapp: 'from-green-500 to-green-600',
+                      twitter: 'from-blue-400 to-blue-500',
+                      facebook: 'from-blue-600 to-blue-700',
+                      linkedin: 'from-blue-700 to-blue-800',
+                      telegram: 'from-sky-500 to-sky-600',
+                      copy: 'from-gray-500 to-gray-600'
+                    }
+                    const methodLabels: Record<string, string> = {
+                      whatsapp: 'WhatsApp',
+                      twitter: 'X (Twitter)',
+                      facebook: 'Facebook',
+                      linkedin: 'LinkedIn',
+                      telegram: 'Telegram',
+                      copy: 'Copiar Link'
+                    }
+                    return (
+                      <div key={i}>
+                        <div className="flex items-center justify-between text-sm mb-1">
+                          <span className="text-white/60">{methodLabels[item.method] || item.method}</span>
+                          <span className="text-white/40">{item.shares}</span>
+                        </div>
+                        <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${(item.shares / getMaxValue(analytics.sharesByMethod.map(s => ({ shares: s.shares })))) * 100}%` }}
+                            className={`h-full bg-gradient-to-r ${methodColors[item.method] || 'from-gray-500 to-gray-600'} rounded-full`}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })}
+                  {analytics.sharesByMethod.length === 0 && (
+                    <p className="text-white/30 text-sm">Nenhum compartilhamento ainda</p>
                   )}
                 </div>
               </div>

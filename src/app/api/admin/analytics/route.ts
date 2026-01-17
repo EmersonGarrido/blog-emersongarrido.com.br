@@ -189,6 +189,61 @@ export async function GET(request: NextRequest) {
       LIMIT 20
     `
 
+    // Total shares
+    const totalSharesResult = await sql`
+      SELECT COUNT(*) as count FROM shares WHERE 1=1 ${sql.unsafe(dateFilter)}
+    `
+    const totalShares = parseInt(totalSharesResult[0].count as string) || 0
+
+    // Shares by method (social network)
+    const sharesByMethod = await sql`
+      SELECT
+        share_method as method,
+        COUNT(*) as shares
+      FROM shares
+      WHERE 1=1 ${sql.unsafe(dateFilter)}
+      GROUP BY share_method
+      ORDER BY shares DESC
+    `
+
+    // Most shared posts
+    const topPostsByShares = await sql`
+      SELECT
+        post_slug,
+        COUNT(*) as shares
+      FROM shares
+      WHERE 1=1 ${sql.unsafe(dateFilter)}
+      GROUP BY post_slug
+      ORDER BY shares DESC
+      LIMIT 10
+    `
+
+    // Recent shares
+    const recentShares = await sql`
+      SELECT
+        id,
+        post_slug,
+        share_method,
+        created_at
+      FROM shares
+      ORDER BY created_at DESC
+      LIMIT 10
+    `
+
+    // UTM tracking breakdown
+    const utmBreakdown = await sql`
+      SELECT
+        utm_source,
+        utm_medium,
+        utm_campaign,
+        COUNT(*) as visits
+      FROM page_views
+      WHERE utm_source IS NOT NULL ${sql.unsafe(dateFilter)}
+      GROUP BY utm_source, utm_medium, utm_campaign
+      ORDER BY visits DESC
+      LIMIT 20
+    `
+
     return NextResponse.json({
       summary: {
         totalViews,
@@ -196,12 +251,17 @@ export async function GET(request: NextRequest) {
         totalLikes,
         totalComments,
         pendingComments,
-        onlineUsers
+        onlineUsers,
+        totalShares
       },
       viewsByDay,
       topPages,
       topPostsByLikes,
       topPostsByComments,
+      topPostsByShares,
+      sharesByMethod,
+      recentShares,
+      utmBreakdown,
       trafficSources,
       countries,
       cities,
