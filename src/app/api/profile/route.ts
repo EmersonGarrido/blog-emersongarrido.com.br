@@ -7,6 +7,8 @@ const defaultProfile = {
   username: 'emersongarrido',
   bio_pt: 'Desenvolvedor, pai, e uma pessoa tentando entender a vida um dia de cada vez.',
   bio_en: 'Developer, father, and someone trying to figure out life one day at a time.',
+  about_pt: '',
+  about_en: '',
   whatsapp: '5567993109148',
   twitter: '',
   instagram: '',

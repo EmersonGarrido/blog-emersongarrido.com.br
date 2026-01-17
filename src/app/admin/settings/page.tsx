@@ -10,6 +10,8 @@ interface ProfileSettings {
   username: string
   bio_pt: string
   bio_en: string
+  about_pt: string
+  about_en: string
   whatsapp: string
   twitter: string
   instagram: string
@@ -22,6 +24,8 @@ const defaultProfile: ProfileSettings = {
   username: 'emersongarrido',
   bio_pt: 'Desenvolvedor, pai, e uma pessoa tentando entender a vida um dia de cada vez.',
   bio_en: 'Developer, father, and someone trying to figure out life one day at a time.',
+  about_pt: '',
+  about_en: '',
   whatsapp: '5567993109148',
   twitter: '',
   instagram: '',
@@ -35,7 +39,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const [writingStyle, setWritingStyle] = useState('')
   const [profile, setProfile] = useState<ProfileSettings>(defaultProfile)
-  const [activeTab, setActiveTab] = useState<'profile' | 'writing'>('profile')
+  const [activeTab, setActiveTab] = useState<'profile' | 'about' | 'writing'>('profile')
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saved' | 'error'>('idle')
 
   const loadSettings = useCallback(async () => {
@@ -227,7 +231,7 @@ Regras para manter a consistência e autenticidade dos textos do blog.
 
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
         {/* Tabs */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => setActiveTab('profile')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -237,6 +241,16 @@ Regras para manter a consistência e autenticidade dos textos do blog.
             }`}
           >
             Perfil
+          </button>
+          <button
+            onClick={() => setActiveTab('about')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              activeTab === 'about'
+                ? 'bg-white text-black'
+                : 'bg-white/10 text-white/60 hover:bg-white/20'
+            }`}
+          >
+            Sobre Mim
           </button>
           <button
             onClick={() => setActiveTab('writing')}
@@ -410,6 +424,65 @@ Regras para manter a consistência e autenticidade dos textos do blog.
                       placeholder="URL ou username"
                     />
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* About Section */}
+        {activeTab === 'about' && (
+          <div className="space-y-6">
+            <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+              <div className="p-4 border-b border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-orange-500/20 rounded-lg">
+                    <svg className="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="font-semibold">Sobre Mim</h2>
+                    <p className="text-sm text-white/40">Texto completo da página &quot;Sobre&quot; em português e inglês</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 space-y-4">
+                <div>
+                  <label className="block text-sm text-white/60 mb-1">Sobre (Português)</label>
+                  <textarea
+                    value={profile.about_pt}
+                    onChange={(e) => updateProfile('about_pt', e.target.value)}
+                    rows={12}
+                    className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-white/20 resize-y font-mono text-sm"
+                    placeholder="Escreva sobre você em português... (suporta Markdown)"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-white/60 mb-1">About (English)</label>
+                  <textarea
+                    value={profile.about_en}
+                    onChange={(e) => updateProfile('about_en', e.target.value)}
+                    rows={12}
+                    className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-white/20 resize-y font-mono text-sm"
+                    placeholder="Write about yourself in English... (supports Markdown)"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+              <div className="flex gap-3">
+                <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div className="text-sm text-blue-200">
+                  <p className="font-medium mb-1">Dica</p>
+                  <ul className="text-blue-300/80 space-y-1">
+                    <li>• Use Markdown para formatar o texto</li>
+                    <li>• O conteúdo aparece na página /sobre do site</li>
+                    <li>• Será exibido de acordo com o idioma do visitante</li>
+                  </ul>
                 </div>
               </div>
             </div>

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
@@ -9,8 +10,101 @@ import HeartReaction from '@/components/HeartReaction'
 import ShareButton from '@/components/ShareButton'
 import Analytics from '@/components/Analytics'
 
+interface ProfileSettings {
+  name: string
+  username: string
+  about_pt: string
+  about_en: string
+}
+
+// Simple markdown to HTML converter
+function markdownToHtml(markdown: string): string {
+  if (!markdown) return ''
+
+  let html = markdown
+    // Escape HTML
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    // Headers
+    .replace(/^### (.*$)/gm, '<h3 class="text-lg font-bold mt-6 mb-2 text-[var(--text-primary)]">$1</h3>')
+    .replace(/^## (.*$)/gm, '<h2 class="text-xl font-bold mt-8 mb-3 text-[var(--text-primary)]">$1</h2>')
+    .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold mt-8 mb-4 text-[var(--text-primary)]">$1</h1>')
+    // Bold and italic
+    .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    // Strikethrough
+    .replace(/~~(.*?)~~/g, '<del>$1</del>')
+    // Links
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">$1</a>')
+    // Line breaks (double newline = paragraph)
+    .split('\n\n')
+    .map(p => p.trim())
+    .filter(p => p)
+    .map(p => {
+      if (p.startsWith('<h1') || p.startsWith('<h2') || p.startsWith('<h3')) {
+        return p
+      }
+      return `<p class="mb-5">${p.replace(/\n/g, '<br>')}</p>`
+    })
+    .join('\n')
+
+  return html
+}
+
+const defaultAboutPt = `Tenho 30 anos, faço 31 em 2026. Nasci em Campo Grande, MS, e hoje trabalho como programador e desenvolvedor de sistemas.
+
+Já morei em muitos lugares: Campo Grande, São José do Rio Claro no Mato Grosso, Manaus, Rio de Janeiro, São Paulo — passei por Campinas, pela capital, por Igaratá — e Brasília, no Sudoeste. Muita mudança, muita estrada, muita fuga.
+
+Porque era isso que eu tava fazendo esse tempo todo, fugindo. Sem saber que na verdade tava fugindo de mim mesmo. E isso é foda, porque não tem como fugir da própria cabeça. Ela vai junto pra onde você for.
+
+Já tive 3 burnouts graves. Fui internado na Santa Casa de Campo Grande em coma. Aos 18 anos sofri um acidente e fiquei 2 anos numa cadeira de rodas, só voltei a andar depois de 2 cirurgias na perna.
+
+Muita coisa aconteceu, muita coisa ainda tá acontecendo. Esse espaço aqui é pra documentar, pra colocar pra fora, pra não guardar tudo sozinho.
+
+...
+
+Comecei a trabalhar com 10 anos. Vendia gelinho, picolé, limpava caminhão pra pegar soja e vender os sacos. Era criança, mas já queria meu dinheiro. Não lembro nem no que gastava, mas lembro que era meu e eu podia fazer o que quisesse.
+
+Nessa época ganhei meu primeiro computador. Daqueles brancos de tubo, com internet discada que só funcionava direito de madrugada. Passava horas navegando, buscando entender como as coisas funcionavam.
+
+Aos 13 pra 14 anos, entrei num fórum chamado ZoneGames e aprendi a criar servidores de jogos. Servidores piratas de MU Online. Meus olhos brilhavam vendo o que eu conseguia fazer. Eram coisas bobas seguindo tutorial, mas pra mim era mágico ver como algumas palavrinhas, alguns blocos de texto editados, faziam tanta diferença.
+
+Ali fiz amigos que tenho até hoje. Mais de 15 anos depois e ainda não conheço vários deles pessoalmente. Mas o tempo validou tanto nossa amizade que não precisa estar perto pra ter respeito. O que manteve a gente foi simples: só dividimos vitórias, nunca problemas.
+
+Aprendi Photoshop, CorelDraw, edição de vídeo, sincronia de áudio. Criava capas, menus interativos, fazia coisas que nem sabia que iam me servir no futuro. Tudo isso virando madrugada, vivendo de energético.
+
+Meu primeiro emprego "de verdade" foi num jornal. Vi um anúncio, mandei e-mail, e em 20 minutos me chamaram pra entrevista. Fui de chinelo, short velho, camiseta e boné. Meu pai falou que eu não podia ir daquele jeito. Fui assim mesmo.
+
+O dono me olhou de cima a baixo e perguntou por que eu tinha ido daquele jeito. Respondi que tinha plena confiança que sabia fazer o trabalho, então aparência não era importante naquele momento. Ele sorriu e me contratou. Acho que foi pela coragem.
+
+Reconstruí o site do jornal em 1 semana. O cara anterior, um professor de faculdade, tava enrolando há 6 meses. Depois disso trabalhei em gráfica, aprendi todo o processo de impressão, offset, acabamento. Passei por designer, web designer, programador, redator.
+
+Cada lugar que passei, cada perrengue que vivi, me ensinou alguma coisa. Até as coisas erradas que fiz me trouxeram aprendizado. Hoje uso tudo isso pra construir sistemas, resolver problemas, criar coisas que funcionam.
+
+Tenho 1,97m de altura. Três filhos que amo. Já casei duas vezes. Já quebrei as duas pernas, o queixo, o ombro. Tenho mais de 24 parafusos na perna esquerda. O joelho ainda falha às vezes, parece que piso e não tem chão.
+
+Mas tô aqui. Escrevendo. Codando. Vivendo. Tentando transformar tudo isso em algo que faça sentido pra alguém.
+
+*continua...*`
+
 export default function SobrePage() {
   const { locale } = useLocale()
+  const [profile, setProfile] = useState<ProfileSettings | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/profile')
+      .then(res => res.json())
+      .then(data => {
+        if (data.profile) {
+          setProfile(data.profile)
+        }
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false))
+  }, [])
 
   const pageUrl = typeof window !== 'undefined'
     ? `${window.location.origin}/sobre`
@@ -19,6 +113,12 @@ export default function SobrePage() {
   const shareText = locale === 'en'
     ? 'Check out the story of @emersongarrido'
     : 'Conheça a história do @emersongarrido'
+
+  const name = profile?.name || 'Emerson Garrido'
+  const username = profile?.username || 'emersongarrido'
+  const aboutContent = locale === 'en'
+    ? (profile?.about_en || profile?.about_pt || defaultAboutPt)
+    : (profile?.about_pt || defaultAboutPt)
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
@@ -56,7 +156,7 @@ export default function SobrePage() {
           <div className="w-24 h-24 rounded-full overflow-hidden ring-2 ring-[var(--border-color)]">
             <Image
               src="/avatar.jpg"
-              alt="Emerson Garrido"
+              alt={name}
               width={96}
               height={96}
               className="w-full h-full object-cover"
@@ -71,7 +171,7 @@ export default function SobrePage() {
           transition={{ duration: 0.4, delay: 0.1 }}
           className="text-2xl font-bold text-center mb-2"
         >
-          Emerson Garrido
+          {name}
         </motion.h1>
 
         <motion.p
@@ -80,7 +180,7 @@ export default function SobrePage() {
           transition={{ duration: 0.4, delay: 0.15 }}
           className="text-[var(--text-secondary)] text-center mb-8"
         >
-          @emersongarrido
+          @{username}
         </motion.p>
 
         {/* Content */}
@@ -88,82 +188,19 @@ export default function SobrePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
-          className="space-y-5 text-[var(--text-secondary)] text-[18px] leading-relaxed font-serif"
+          className="text-[var(--text-secondary)] text-[18px] leading-relaxed font-serif"
         >
-          <p>
-            Tenho 30 anos, faço 31 em 2026. Nasci em Campo Grande, MS, e hoje trabalho como programador e desenvolvedor de sistemas.
-          </p>
-
-          <p>
-            Já morei em muitos lugares: Campo Grande, São José do Rio Claro no Mato Grosso, Manaus, Rio de Janeiro, São Paulo — passei por Campinas, pela capital, por Igaratá — e Brasília, no Sudoeste. Muita mudança, muita estrada, muita fuga.
-          </p>
-
-          <p>
-            Porque era isso que eu tava fazendo esse tempo todo, fugindo. Sem saber que na verdade tava fugindo de mim mesmo. E isso é foda, porque não tem como fugir da própria cabeça. Ela vai junto pra onde você for.
-          </p>
-
-          <p>
-            Já tive 3 burnouts graves. Fui internado na Santa Casa de Campo Grande em coma. Aos 18 anos sofri um acidente e fiquei 2 anos numa cadeira de rodas, só voltei a andar depois de 2 cirurgias na perna.
-          </p>
-
-          <p>
-            Muita coisa aconteceu, muita coisa ainda tá acontecendo. Esse espaço aqui é pra documentar, pra colocar pra fora, pra não guardar tudo sozinho.
-          </p>
-
-          <p className="text-[var(--text-muted)] italic mt-8 mb-8">
-            ...
-          </p>
-
-          <p>
-            Comecei a trabalhar com 10 anos. Vendia gelinho, picolé, limpava caminhão pra pegar soja e vender os sacos. Era criança, mas já queria meu dinheiro. Não lembro nem no que gastava, mas lembro que era meu e eu podia fazer o que quisesse.
-          </p>
-
-          <p>
-            Nessa época ganhei meu primeiro computador. Daqueles brancos de tubo, com internet discada que só funcionava direito de madrugada. Passava horas navegando, buscando entender como as coisas funcionavam.
-          </p>
-
-          <p>
-            Aos 13 pra 14 anos, entrei num fórum chamado ZoneGames e aprendi a criar servidores de jogos. Servidores piratas de MU Online. Meus olhos brilhavam vendo o que eu conseguia fazer. Eram coisas bobas seguindo tutorial, mas pra mim era mágico ver como algumas palavrinhas, alguns blocos de texto editados, faziam tanta diferença.
-          </p>
-
-          <p>
-            Ali fiz amigos que tenho até hoje. Mais de 15 anos depois e ainda não conheço vários deles pessoalmente. Mas o tempo validou tanto nossa amizade que não precisa estar perto pra ter respeito. O que manteve a gente foi simples: só dividimos vitórias, nunca problemas.
-          </p>
-
-          <p>
-            Aprendi Photoshop, CorelDraw, edição de vídeo, sincronia de áudio. Criava capas, menus interativos, fazia coisas que nem sabia que iam me servir no futuro. Tudo isso virando madrugada, vivendo de energético.
-          </p>
-
-          <p>
-            Meu primeiro emprego "de verdade" foi num jornal. Vi um anúncio, mandei e-mail, e em 20 minutos me chamaram pra entrevista. Fui de chinelo, short velho, camiseta e boné. Meu pai falou que eu não podia ir daquele jeito. Fui assim mesmo.
-          </p>
-
-          <p>
-            O dono me olhou de cima a baixo e perguntou por que eu tinha ido daquele jeito. Respondi que tinha plena confiança que sabia fazer o trabalho, então aparência não era importante naquele momento. Ele sorriu e me contratou. Acho que foi pela coragem.
-          </p>
-
-          <p>
-            Reconstruí o site do jornal em 1 semana. O cara anterior, um professor de faculdade, tava enrolando há 6 meses. Depois disso trabalhei em gráfica, aprendi todo o processo de impressão, offset, acabamento. Passei por designer, web designer, programador, redator.
-          </p>
-
-          <p>
-            Cada lugar que passei, cada perrengue que vivi, me ensinou alguma coisa. Até as coisas erradas que fiz me trouxeram aprendizado. Hoje uso tudo isso pra construir sistemas, resolver problemas, criar coisas que funcionam.
-          </p>
-
-          <p>
-            Tenho 1,97m de altura. Três filhos que amo. Já casei duas vezes. Já quebrei as duas pernas, o queixo, o ombro. Tenho mais de 24 parafusos na perna esquerda. O joelho ainda falha às vezes, parece que piso e não tem chão.
-          </p>
-
-          <p>
-            Mas tô aqui. Escrevendo. Codando. Vivendo. Tentando transformar tudo isso em algo que faça sentido pra alguém.
-          </p>
-
-          <p className="text-[var(--text-muted)] italic">
-            continua...
-          </p>
-
-          <p className="text-[var(--text-muted)] text-sm">
-            Última atualização: 16 de janeiro de 2026</p>
+          {loading ? (
+            <div className="space-y-4">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="h-4 bg-[var(--bg-tertiary)] rounded animate-pulse" style={{ width: `${80 + Math.random() * 20}%` }} />
+              ))}
+            </div>
+          ) : (
+            <div
+              dangerouslySetInnerHTML={{ __html: markdownToHtml(aboutContent) }}
+            />
+          )}
         </motion.div>
 
         {/* Actions */}
