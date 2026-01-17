@@ -12,6 +12,24 @@ function slugify(text: string): string {
     .replace(/(^-|-$)+/g, '')
 }
 
+async function generateUniqueSlug(baseSlug: string, excludeId?: number): Promise<string> {
+  let slug = baseSlug
+  let counter = 1
+
+  while (true) {
+    const existing = excludeId
+      ? await sql`SELECT id FROM posts WHERE slug = ${slug} AND id != ${excludeId}`
+      : await sql`SELECT id FROM posts WHERE slug = ${slug}`
+
+    if (existing.length === 0) {
+      return slug
+    }
+
+    counter++
+    slug = `${baseSlug}-${counter}`
+  }
+}
+
 // Get all posts with search, filter, and pagination
 export async function GET(request: NextRequest) {
   const authenticated = await isAuthenticated()
@@ -64,7 +82,7 @@ export async function GET(request: NextRequest) {
         AND (p.title ILIKE ${searchPattern} OR p.excerpt ILIKE ${searchPattern})
         ${status === 'published' ? sql`AND p.published = true` : status === 'draft' ? sql`AND p.published = false` : sql``}
         GROUP BY p.id
-        ORDER BY p.created_at DESC
+        ORDER BY p.is_pinned DESC NULLS LAST, p.created_at DESC
         LIMIT ${limit} OFFSET ${offset}
       `
     } else if (search) {
@@ -91,7 +109,7 @@ export async function GET(request: NextRequest) {
         FROM posts p
         WHERE (p.title ILIKE ${searchPattern} OR p.excerpt ILIKE ${searchPattern})
         ${status === 'published' ? sql`AND p.published = true` : status === 'draft' ? sql`AND p.published = false` : sql``}
-        ORDER BY p.created_at DESC
+        ORDER BY p.is_pinned DESC NULLS LAST, p.created_at DESC
         LIMIT ${limit} OFFSET ${offset}
       `
     } else if (categoryId) {
@@ -122,7 +140,7 @@ export async function GET(request: NextRequest) {
         WHERE pc.category_id = ${catId}
         ${status === 'published' ? sql`AND p.published = true` : status === 'draft' ? sql`AND p.published = false` : sql``}
         GROUP BY p.id
-        ORDER BY p.created_at DESC
+        ORDER BY p.is_pinned DESC NULLS LAST, p.created_at DESC
         LIMIT ${limit} OFFSET ${offset}
       `
     } else {
@@ -142,7 +160,7 @@ export async function GET(request: NextRequest) {
             (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
           FROM posts p
           WHERE p.published = true
-          ORDER BY p.created_at DESC
+          ORDER BY p.is_pinned DESC NULLS LAST, p.created_at DESC
           LIMIT ${limit} OFFSET ${offset}
         `
       } else if (status === 'draft') {
@@ -160,7 +178,7 @@ export async function GET(request: NextRequest) {
             (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
           FROM posts p
           WHERE p.published = false
-          ORDER BY p.created_at DESC
+          ORDER BY p.is_pinned DESC NULLS LAST, p.created_at DESC
           LIMIT ${limit} OFFSET ${offset}
         `
       } else {
@@ -177,7 +195,7 @@ export async function GET(request: NextRequest) {
             (SELECT COUNT(*) FROM likes l WHERE l.post_slug = p.slug)::int as likes_count,
             (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
           FROM posts p
-          ORDER BY p.created_at DESC
+          ORDER BY p.is_pinned DESC NULLS LAST, p.created_at DESC
           LIMIT ${limit} OFFSET ${offset}
         `
       }
@@ -231,13 +249,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Title and content are required' }, { status: 400 })
     }
 
-    const slug = slugify(title)
-
-    // Check if slug already exists
-    const existing = await sql`SELECT id FROM posts WHERE slug = ${slug}`
-    if (existing.length > 0) {
-      return NextResponse.json({ error: 'A post with this title already exists' }, { status: 400 })
-    }
+    const baseSlug = slugify(title)
+    const slug = await generateUniqueSlug(baseSlug)
 
     const publishedAt = published ? new Date() : null
 

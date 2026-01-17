@@ -12,6 +12,24 @@ function slugify(text: string): string {
     .replace(/(^-|-$)+/g, '')
 }
 
+async function generateUniqueSlug(baseSlug: string, excludeId?: number): Promise<string> {
+  let slug = baseSlug
+  let counter = 1
+
+  while (true) {
+    const existing = excludeId
+      ? await sql`SELECT id FROM posts WHERE slug = ${slug} AND id != ${excludeId}`
+      : await sql`SELECT id FROM posts WHERE slug = ${slug}`
+
+    if (existing.length === 0) {
+      return slug
+    }
+
+    counter++
+    slug = `${baseSlug}-${counter}`
+  }
+}
+
 // Get single post
 export async function GET(
   request: NextRequest,
@@ -86,15 +104,11 @@ export async function PUT(
       `
     }
 
-    const newSlug = slugify(title)
-
-    // Check if new slug conflicts with another post
-    if (newSlug !== current[0].slug) {
-      const existing = await sql`SELECT id FROM posts WHERE slug = ${newSlug} AND id != ${id}`
-      if (existing.length > 0) {
-        return NextResponse.json({ error: 'A post with this title already exists' }, { status: 400 })
-      }
-    }
+    const baseSlug = slugify(title)
+    // Gerar slug único se o título mudou
+    const newSlug = baseSlug !== current[0].slug
+      ? await generateUniqueSlug(baseSlug, parseInt(id))
+      : current[0].slug
 
     // Set published_at if publishing for the first time
     let publishedAt = null
