@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { useLocale } from '@/contexts/LocaleContext'
 import ShareModal from '@/components/ShareModal'
+import { useSounds } from '@/hooks/useSounds'
 import type { Post } from '@/lib/posts'
 
 interface PostCardProps {
@@ -15,6 +16,7 @@ interface PostCardProps {
 
 export default function PostCard({ post, index }: PostCardProps) {
   const { locale } = useLocale()
+  const { playSound } = useSounds()
   const [viewsCount, setViewsCount] = useState(0)
   const [likesCount, setLikesCount] = useState(0)
   const [commentsCount, setCommentsCount] = useState(0)
@@ -57,11 +59,13 @@ export default function PostCard({ post, index }: PostCardProps) {
 
     try {
       if (isLiked) {
+        playSound('unlike')
         const res = await fetch(`/api/likes?slug=${encodeURIComponent(post.slug)}`, { method: 'DELETE' })
         const data = await res.json()
         setLikesCount(data.total || 0)
         setIsLiked(false)
       } else {
+        playSound('like')
         const res = await fetch('/api/likes', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

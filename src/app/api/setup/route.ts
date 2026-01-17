@@ -120,6 +120,11 @@ export async function GET() {
       )
     `
 
+    // Mark all published posts as reviewed by AI
+    await sql`
+      UPDATE posts SET ai_reviewed = true WHERE published = true AND ai_reviewed = false
+    `
+
     return NextResponse.json({ success: true, message: 'Database setup complete!' })
   } catch (error) {
     console.error('Setup error:', error)

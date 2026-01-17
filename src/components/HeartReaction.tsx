@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLocale } from '@/contexts/LocaleContext'
+import { useSounds } from '@/hooks/useSounds'
 
 interface HeartReactionProps {
   postSlug: string
@@ -11,6 +12,7 @@ interface HeartReactionProps {
 
 export default function HeartReaction({ postSlug, pageType = 'post' }: HeartReactionProps) {
   const { locale } = useLocale()
+  const { playSound } = useSounds()
 
   const [liked, setLiked] = useState(false)
   const [totalLikes, setTotalLikes] = useState(0)
@@ -35,6 +37,9 @@ export default function HeartReaction({ postSlug, pageType = 'post' }: HeartReac
     setLoading(true)
 
     const newLiked = !liked
+
+    // Play sound
+    playSound(newLiked ? 'like' : 'unlike')
 
     // Optimistic update
     setLiked(newLiked)
