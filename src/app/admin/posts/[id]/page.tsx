@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import RichEditor from '@/components/RichEditor'
+import CategoryModal from '@/components/CategoryModal'
 
 interface Category {
   id: number
@@ -26,6 +27,8 @@ export default function EditPostPage() {
   const [published, setPublished] = useState(false)
   const [error, setError] = useState('')
   const [showPreview, setShowPreview] = useState(false)
+  const [showCategoryModal, setShowCategoryModal] = useState(false)
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
 
   useEffect(() => {
     if (!id) return
@@ -130,6 +133,44 @@ export default function EditPostPage() {
     )
   }
 
+  const loadCategories = async () => {
+    try {
+      const res = await fetch('/api/admin/categories')
+      const data = await res.json()
+      setCategories(data.categories || [])
+    } catch (error) {
+      console.error('Load categories error:', error)
+    }
+  }
+
+  const handleCategorySaved = (category: Category) => {
+    if (category.id === -1) {
+      // Deleted
+      loadCategories()
+      return
+    }
+    if (editingCategory) {
+      // Updated
+      setCategories(prev => prev.map(c => c.id === category.id ? category : c))
+    } else {
+      // Created - add to list and select it
+      setCategories(prev => [...prev, category])
+      setSelectedCategories(prev => [...prev, category.id])
+    }
+    setEditingCategory(null)
+  }
+
+  const openCreateCategory = () => {
+    setEditingCategory(null)
+    setShowCategoryModal(true)
+  }
+
+  const openEditCategory = (cat: Category, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setEditingCategory(cat)
+    setShowCategoryModal(true)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -226,24 +267,51 @@ export default function EditPostPage() {
 
             {/* Categories */}
             <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-              <h3 className="text-sm font-medium mb-3 text-white/60">Categorias</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-medium text-white/60">Categorias</h3>
+                <button
+                  type="button"
+                  onClick={openCreateCategory}
+                  className="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded-lg transition-colors flex items-center gap-1"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Nova
+                </button>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {categories.length === 0 ? (
-                  <p className="text-white/30 text-sm">Nenhuma categoria. <Link href="/admin/categories" className="text-white/60 hover:text-white underline">Criar categoria</Link></p>
+                  <p className="text-white/30 text-sm">Nenhuma categoria criada ainda.</p>
                 ) : (
                   categories.map((cat) => (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => toggleCategory(cat.id)}
-                      className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
-                        selectedCategories.includes(cat.id)
-                          ? 'bg-white text-black'
-                          : 'bg-white/10 text-white/60 hover:bg-white/20'
-                      }`}
-                    >
-                      {cat.name}
-                    </button>
+                    <div key={cat.id} className="group relative">
+                      <button
+                        type="button"
+                        onClick={() => toggleCategory(cat.id)}
+                        className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+                          selectedCategories.includes(cat.id)
+                            ? 'bg-white text-black pr-8'
+                            : 'bg-white/10 text-white/60 hover:bg-white/20 pr-8'
+                        }`}
+                      >
+                        {cat.name}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => openEditCategory(cat, e)}
+                        className={`absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity ${
+                          selectedCategories.includes(cat.id)
+                            ? 'hover:bg-black/10 text-black/60'
+                            : 'hover:bg-white/20 text-white/40'
+                        }`}
+                        title="Editar categoria"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      </button>
+                    </div>
                   ))
                 )}
               </div>
@@ -327,6 +395,17 @@ export default function EditPostPage() {
           </form>
         )}
       </main>
+
+      {/* Category Modal */}
+      <CategoryModal
+        isOpen={showCategoryModal}
+        onClose={() => {
+          setShowCategoryModal(false)
+          setEditingCategory(null)
+        }}
+        onSaved={handleCategorySaved}
+        editCategory={editingCategory}
+      />
     </div>
   )
 }
