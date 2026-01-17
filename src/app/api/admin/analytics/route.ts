@@ -189,6 +189,19 @@ export async function GET(request: NextRequest) {
       LIMIT 20
     `
 
+    // Ensure shares table exists
+    await sql`
+      CREATE TABLE IF NOT EXISTS shares (
+        id SERIAL PRIMARY KEY,
+        post_slug VARCHAR(255) NOT NULL,
+        share_method VARCHAR(50) NOT NULL,
+        visitor_id VARCHAR(100),
+        ip_address VARCHAR(50),
+        user_agent TEXT,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `
+
     // Total shares
     const totalSharesResult = await sql`
       SELECT COUNT(*) as count FROM shares WHERE 1=1 ${sql.unsafe(dateFilter)}
