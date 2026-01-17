@@ -6,6 +6,8 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import RichEditor from '@/components/RichEditor'
 import CategoryModal from '@/components/CategoryModal'
+import AIImageGenerator from '@/components/AIImageGenerator'
+import PostPreviewContent from '@/components/PostPreviewContent'
 
 interface Category {
   id: number
@@ -373,12 +375,12 @@ export default function NewPostPage() {
         )}
 
         {showPreview ? (
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
-            <h1 className="text-3xl font-bold mb-4">{title || 'Sem título'}</h1>
-            <div className="prose prose-invert max-w-none">
-              <div dangerouslySetInnerHTML={{ __html: markdownToHtml(content) }} />
-            </div>
-          </div>
+          <PostPreviewContent
+            content={content}
+            title={title}
+            categories={categories}
+            selectedCategories={selectedCategories}
+          />
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Title */}
@@ -452,6 +454,15 @@ export default function NewPostPage() {
                 )}
               </div>
             </div>
+
+            {/* AI Image Generator */}
+            <AIImageGenerator
+              title={title}
+              content={content}
+              onInsertImage={(imageUrl) => {
+                setContent(`![](${imageUrl})\n\n${content}`)
+              }}
+            />
 
             {/* Share Preview */}
             <div className="bg-white/5 border border-white/10 rounded-xl p-4">
@@ -554,6 +565,27 @@ function markdownToHtml(markdown: string): string {
   html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
   html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>')
   html = html.replace(/~~([^~]+)~~/g, '<s>$1</s>')
+
+  // Post link card (preview version)
+  html = html.replace(/::post-link\[([^\]]+)\]/g, `
+    <div style="margin: 1rem 0; padding: 1rem; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+      <div style="display: flex; gap: 1rem; align-items: flex-start;">
+        <div style="width: 60px; height: 60px; border-radius: 8px; background: rgba(255,255,255,0.1); flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+          <svg style="width: 24px; height: 24px; color: rgba(255,255,255,0.3);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Post relacionado</div>
+          <div style="font-size: 14px; font-weight: 600; color: #60a5fa; margin-bottom: 4px;">$1</div>
+          <div style="font-size: 12px; color: rgba(255,255,255,0.5);">O card completo aparecerá no post publicado</div>
+        </div>
+        <svg style="width: 16px; height: 16px; color: rgba(255,255,255,0.3); flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </div>
+    </div>
+  `)
 
   // Links
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-400 underline">$1</a>')

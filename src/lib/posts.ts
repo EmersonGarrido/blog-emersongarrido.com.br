@@ -106,8 +106,79 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
   }
 }
 
+async function getPostMetrics(slug: string) {
+  try {
+    const [viewsResult, likesResult, commentsResult] = await Promise.all([
+      sql`SELECT COUNT(*) as count FROM page_views WHERE post_slug = ${slug}`,
+      sql`SELECT COUNT(*) as count FROM likes WHERE post_slug = ${slug}`,
+      sql`SELECT COUNT(*) as count FROM comments WHERE post_slug = ${slug} AND is_approved = true`
+    ])
+    return {
+      views: Number(viewsResult[0]?.count || 0),
+      likes: Number(likesResult[0]?.count || 0),
+      comments: Number(commentsResult[0]?.count || 0)
+    }
+  } catch {
+    return { views: 0, likes: 0, comments: 0 }
+  }
+}
+
 export async function getPostContent(content: string): Promise<string> {
-  const processedContent = await remark().use(html).process(content)
+  // Process ::post-link[slug] to fetch linked post data
+  let processedMarkdown = content
+
+  // Find all post-link references
+  const postLinkRegex = /::post-link\[([^\]]+)\]/g
+  let match: RegExpExecArray | null
+
+  while ((match = postLinkRegex.exec(content)) !== null) {
+    const slug = match[1]
+    const linkedPost = await getPostBySlug(slug)
+
+    if (linkedPost) {
+      const metrics = await getPostMetrics(slug)
+      const categories = linkedPost.categories || []
+      const hashtags = categories.map(c => `<span style="color: #60a5fa;">#${c.toLowerCase().replace(/\s+/g, '')}</span>`).join(' ')
+
+      // Replace with a nice card HTML
+      const cardHtml = `
+<div class="post-link-card" style="margin: 1.5rem 0; background: var(--bg-tertiary, #0d0d0d); border: 1px solid var(--border-color, rgba(255,255,255,0.1)); border-radius: 16px; overflow: hidden;">
+  <a href="/post/${slug}" style="text-decoration: none; color: inherit; display: block;">
+    <div style="padding: 12px 16px; display: flex; align-items: center; gap: 12px;">
+      <img src="/avatar.jpg" alt="" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" onerror="this.style.display='none'" />
+      <div style="flex: 1;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span style="font-weight: 600; font-size: 15px; color: var(--text-primary, #fff);">emersongarrido</span>
+          <svg style="width: 16px; height: 16px; color: #60a5fa;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+          <span style="color: var(--text-muted, #666);">·</span>
+          <span style="color: var(--text-muted, #666); font-size: 14px;">${new Date(linkedPost.date).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+        </div>
+      </div>
+    </div>
+    <div style="margin: 0 12px 12px; padding: 16px; background: var(--bg-secondary, rgba(255,255,255,0.05)); border: 1px solid var(--border-color, rgba(255,255,255,0.1)); border-radius: 12px;">
+      <div style="display: flex; align-items: flex-start; gap: 12px;">
+        <div style="flex: 1; min-width: 0;">
+          <p style="margin: 0 0 12px; font-size: 15px; color: var(--text-secondary, #ccc); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">${linkedPost.excerpt || linkedPost.title}</p>
+          ${hashtags ? `<div style="font-size: 14px;">${hashtags}</div>` : ''}
+        </div>
+        <svg style="width: 20px; height: 20px; color: var(--text-muted, #666); flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </div>
+    </div>
+    <div style="padding: 0 16px 12px; display: flex; gap: 16px; font-size: 13px; color: var(--text-muted, #666);">
+      <span style="display: flex; align-items: center; gap: 4px;"><svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>${metrics.views}</span>
+      <span style="display: flex; align-items: center; gap: 4px;"><svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>${metrics.likes}</span>
+      <span style="display: flex; align-items: center; gap: 4px;"><svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>${metrics.comments}</span>
+    </div>
+  </a>
+</div>`
+      processedMarkdown = processedMarkdown.replace(match[0], cardHtml)
+    } else {
+      // Post not found - show simple message
+      processedMarkdown = processedMarkdown.replace(match[0], `<div style="padding: 1rem; background: rgba(255,0,0,0.1); border-radius: 8px; color: #f87171; font-size: 13px;">Post não encontrado: ${slug}</div>`)
+    }
+  }
+
+  const processedContent = await remark().use(html, { sanitize: false }).process(processedMarkdown)
   return processedContent.toString()
 }
 
