@@ -242,7 +242,7 @@ export default function Comments({ postSlug }: CommentsProps) {
                         </svg>
                       </div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-medium text-xs">{comment.author_name || (locale === 'en' ? 'Anonymous' : 'Anônimo')}</span>
+                        <span className="font-medium text-xs">{locale === 'en' ? 'Anonymous' : 'Anônimo'}</span>
                         <span className="text-[var(--text-muted)] text-xs">
                           {formatDate(comment.created_at)}
                         </span>
