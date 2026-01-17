@@ -1,6 +1,7 @@
 import { sql } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { isAuthenticated } from '@/lib/auth'
+import { revalidatePath } from 'next/cache'
 
 function slugify(text: string): string {
   return text
@@ -258,6 +259,9 @@ export async function POST(request: NextRequest) {
         `
       }
     }
+
+    // Revalidar cache da página inicial
+    revalidatePath('/')
 
     return NextResponse.json({ success: true, id: postId, slug })
   } catch (error) {

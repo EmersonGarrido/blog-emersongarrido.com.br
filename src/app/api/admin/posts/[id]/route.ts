@@ -1,6 +1,7 @@
 import { sql } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { isAuthenticated } from '@/lib/auth'
+import { revalidatePath } from 'next/cache'
 
 function slugify(text: string): string {
   return text
@@ -131,6 +132,13 @@ export async function PUT(
       }
     }
 
+    // Revalidar cache das páginas
+    revalidatePath('/')
+    revalidatePath(`/post/${newSlug}`)
+    if (newSlug !== current[0].slug) {
+      revalidatePath(`/post/${current[0].slug}`)
+    }
+
     return NextResponse.json({ success: true, slug: newSlug })
   } catch (error) {
     console.error('Update post error:', error)
@@ -151,7 +159,17 @@ export async function DELETE(
   const { id } = await params
 
   try {
+    // Pegar o slug antes de deletar para revalidar
+    const post = await sql`SELECT slug FROM posts WHERE id = ${id}`
+
     await sql`DELETE FROM posts WHERE id = ${id}`
+
+    // Revalidar cache
+    revalidatePath('/')
+    if (post.length > 0) {
+      revalidatePath(`/post/${post[0].slug}`)
+    }
+
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Delete post error:', error)

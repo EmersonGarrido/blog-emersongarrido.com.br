@@ -63,7 +63,29 @@ Apresente o feedback de forma estruturada:
 [Trecho original] → [Trecho sugerido]
 ```
 
-### 5. Marcar como Revisado pela IA
+### 5. Verificar e Atribuir Categorias
+
+Todo post DEVE ter pelo menos uma categoria. Verifique as categorias existentes:
+
+```sql
+SELECT id, name, slug FROM categories ORDER BY name;
+```
+
+Categorias atuais: `diário`, `família`, `reflexões`, `saúde mental`
+
+Para atribuir categoria a um post:
+
+```sql
+INSERT INTO post_categories (post_id, category_id) VALUES ([ID_DO_POST], [ID_DA_CATEGORIA]);
+```
+
+Se nenhuma categoria existente se encaixa, crie uma nova:
+
+```sql
+INSERT INTO categories (name, slug, color) VALUES ('nome da categoria', 'slug-da-categoria', '#6b7280');
+```
+
+### 6. Marcar como Revisado pela IA
 
 Após revisar, atualize o campo `ai_reviewed`:
 
