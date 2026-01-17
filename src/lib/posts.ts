@@ -13,6 +13,7 @@ export interface Post {
   contentHtml?: string
   readingTime?: number
   isPinned?: boolean
+  aiReviewed?: boolean
 }
 
 export function calculateReadingTime(content: string): number {
@@ -71,6 +72,7 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
         p.content,
         p.image,
         p.published_at,
+        p.ai_reviewed,
         COALESCE(
           (SELECT json_agg(c.name)
            FROM categories c
@@ -95,7 +97,8 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
       image: post.image as string | undefined,
       categories: Array.isArray(post.categories) ? post.categories : [],
       content: post.content as string,
-      readingTime: calculateReadingTime(post.content as string)
+      readingTime: calculateReadingTime(post.content as string),
+      aiReviewed: post.ai_reviewed as boolean
     }
   } catch (error) {
     console.error('Error fetching post from database:', error)

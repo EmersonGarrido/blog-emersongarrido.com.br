@@ -62,6 +62,22 @@ export async function GET() {
     await sql`CREATE INDEX IF NOT EXISTS idx_comments_post_slug ON comments(post_slug)`
     await sql`CREATE INDEX IF NOT EXISTS idx_comments_approved ON comments(is_approved)`
 
+    // Add is_edited column to comments if it doesn't exist
+    await sql`
+      ALTER TABLE comments ADD COLUMN IF NOT EXISTS is_edited BOOLEAN DEFAULT false
+    `
+
+    // Create comment_likes table
+    await sql`
+      CREATE TABLE IF NOT EXISTS comment_likes (
+        id SERIAL PRIMARY KEY,
+        comment_id INTEGER NOT NULL REFERENCES comments(id) ON DELETE CASCADE,
+        visitor_id VARCHAR(100) NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE(comment_id, visitor_id)
+      )
+    `
+
     // Create likes table
     await sql`
       CREATE TABLE IF NOT EXISTS likes (
