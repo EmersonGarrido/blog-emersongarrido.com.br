@@ -27,80 +27,163 @@ export async function GET(request: NextRequest) {
   const offset = (page - 1) * limit
 
   try {
-    // Build WHERE conditions
-    const conditions: string[] = []
-
-    if (status === 'published') {
-      conditions.push('p.published = true')
-    } else if (status === 'draft') {
-      conditions.push('p.published = false')
-    }
-
-    if (search) {
-      conditions.push(`(p.title ILIKE '%' || $search || '%' OR p.excerpt ILIKE '%' || $search || '%')`)
-    }
-
-    if (categoryId) {
-      conditions.push(`EXISTS (SELECT 1 FROM post_categories pc2 WHERE pc2.post_id = p.id AND pc2.category_id = $categoryId)`)
-    }
-
-    const whereClause = conditions.length > 0 ? conditions.join(' AND ') : '1=1'
-
-    // Get total count for pagination
+    // Build the query based on filters
+    let posts
     let totalResult
+
+    // Simple approach: different queries based on filter combination
     if (search && categoryId) {
+      // Search + category filter
+      const searchPattern = `%${search}%`
+      const catId = parseInt(categoryId)
+
       totalResult = await sql`
-        SELECT COUNT(*) as total FROM posts p
-        WHERE ${sql.unsafe(whereClause.replace('$search', `'${search.replace(/'/g, "''")}'`).replace('$categoryId', categoryId))}
+        SELECT COUNT(DISTINCT p.id) as total
+        FROM posts p
+        JOIN post_categories pc ON pc.post_id = p.id
+        WHERE pc.category_id = ${catId}
+        AND (p.title ILIKE ${searchPattern} OR p.excerpt ILIKE ${searchPattern})
+        ${status === 'published' ? sql`AND p.published = true` : status === 'draft' ? sql`AND p.published = false` : sql``}
+      `
+
+      posts = await sql`
+        SELECT p.*,
+          COALESCE(
+            (SELECT json_agg(json_build_object('id', c.id, 'name', c.name, 'slug', c.slug))
+             FROM categories c
+             JOIN post_categories pc2 ON pc2.category_id = c.id
+             WHERE pc2.post_id = p.id), '[]'
+          ) as categories,
+          (SELECT COUNT(*) FROM page_views pv WHERE pv.post_slug = p.slug)::int as views_count,
+          (SELECT COUNT(*) FROM likes l WHERE l.post_slug = p.slug)::int as likes_count,
+          (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
+        FROM posts p
+        JOIN post_categories pc ON pc.post_id = p.id
+        WHERE pc.category_id = ${catId}
+        AND (p.title ILIKE ${searchPattern} OR p.excerpt ILIKE ${searchPattern})
+        ${status === 'published' ? sql`AND p.published = true` : status === 'draft' ? sql`AND p.published = false` : sql``}
+        GROUP BY p.id
+        ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
+        LIMIT ${limit} OFFSET ${offset}
       `
     } else if (search) {
+      // Search only
+      const searchPattern = `%${search}%`
+
       totalResult = await sql`
         SELECT COUNT(*) as total FROM posts p
-        WHERE ${sql.unsafe(whereClause.replace('$search', `'${search.replace(/'/g, "''")}'`))}
+        WHERE (p.title ILIKE ${searchPattern} OR p.excerpt ILIKE ${searchPattern})
+        ${status === 'published' ? sql`AND p.published = true` : status === 'draft' ? sql`AND p.published = false` : sql``}
+      `
+
+      posts = await sql`
+        SELECT p.*,
+          COALESCE(
+            (SELECT json_agg(json_build_object('id', c.id, 'name', c.name, 'slug', c.slug))
+             FROM categories c
+             JOIN post_categories pc ON pc.category_id = c.id
+             WHERE pc.post_id = p.id), '[]'
+          ) as categories,
+          (SELECT COUNT(*) FROM page_views pv WHERE pv.post_slug = p.slug)::int as views_count,
+          (SELECT COUNT(*) FROM likes l WHERE l.post_slug = p.slug)::int as likes_count,
+          (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
+        FROM posts p
+        WHERE (p.title ILIKE ${searchPattern} OR p.excerpt ILIKE ${searchPattern})
+        ${status === 'published' ? sql`AND p.published = true` : status === 'draft' ? sql`AND p.published = false` : sql``}
+        ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
+        LIMIT ${limit} OFFSET ${offset}
       `
     } else if (categoryId) {
+      // Category filter only
+      const catId = parseInt(categoryId)
+
       totalResult = await sql`
-        SELECT COUNT(*) as total FROM posts p
-        WHERE ${sql.unsafe(whereClause.replace('$categoryId', categoryId))}
+        SELECT COUNT(DISTINCT p.id) as total
+        FROM posts p
+        JOIN post_categories pc ON pc.post_id = p.id
+        WHERE pc.category_id = ${catId}
+        ${status === 'published' ? sql`AND p.published = true` : status === 'draft' ? sql`AND p.published = false` : sql``}
+      `
+
+      posts = await sql`
+        SELECT p.*,
+          COALESCE(
+            (SELECT json_agg(json_build_object('id', c.id, 'name', c.name, 'slug', c.slug))
+             FROM categories c
+             JOIN post_categories pc2 ON pc2.category_id = c.id
+             WHERE pc2.post_id = p.id), '[]'
+          ) as categories,
+          (SELECT COUNT(*) FROM page_views pv WHERE pv.post_slug = p.slug)::int as views_count,
+          (SELECT COUNT(*) FROM likes l WHERE l.post_slug = p.slug)::int as likes_count,
+          (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
+        FROM posts p
+        JOIN post_categories pc ON pc.post_id = p.id
+        WHERE pc.category_id = ${catId}
+        ${status === 'published' ? sql`AND p.published = true` : status === 'draft' ? sql`AND p.published = false` : sql``}
+        GROUP BY p.id
+        ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
+        LIMIT ${limit} OFFSET ${offset}
       `
     } else {
-      totalResult = await sql`
-        SELECT COUNT(*) as total FROM posts p
-        WHERE ${sql.unsafe(whereClause)}
-      `
+      // No search or category filter
+      if (status === 'published') {
+        totalResult = await sql`SELECT COUNT(*) as total FROM posts p WHERE p.published = true`
+        posts = await sql`
+          SELECT p.*,
+            COALESCE(
+              (SELECT json_agg(json_build_object('id', c.id, 'name', c.name, 'slug', c.slug))
+               FROM categories c
+               JOIN post_categories pc ON pc.category_id = c.id
+               WHERE pc.post_id = p.id), '[]'
+            ) as categories,
+            (SELECT COUNT(*) FROM page_views pv WHERE pv.post_slug = p.slug)::int as views_count,
+            (SELECT COUNT(*) FROM likes l WHERE l.post_slug = p.slug)::int as likes_count,
+            (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
+          FROM posts p
+          WHERE p.published = true
+          ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
+          LIMIT ${limit} OFFSET ${offset}
+        `
+      } else if (status === 'draft') {
+        totalResult = await sql`SELECT COUNT(*) as total FROM posts p WHERE p.published = false`
+        posts = await sql`
+          SELECT p.*,
+            COALESCE(
+              (SELECT json_agg(json_build_object('id', c.id, 'name', c.name, 'slug', c.slug))
+               FROM categories c
+               JOIN post_categories pc ON pc.category_id = c.id
+               WHERE pc.post_id = p.id), '[]'
+            ) as categories,
+            (SELECT COUNT(*) FROM page_views pv WHERE pv.post_slug = p.slug)::int as views_count,
+            (SELECT COUNT(*) FROM likes l WHERE l.post_slug = p.slug)::int as likes_count,
+            (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
+          FROM posts p
+          WHERE p.published = false
+          ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
+          LIMIT ${limit} OFFSET ${offset}
+        `
+      } else {
+        totalResult = await sql`SELECT COUNT(*) as total FROM posts p`
+        posts = await sql`
+          SELECT p.*,
+            COALESCE(
+              (SELECT json_agg(json_build_object('id', c.id, 'name', c.name, 'slug', c.slug))
+               FROM categories c
+               JOIN post_categories pc ON pc.category_id = c.id
+               WHERE pc.post_id = p.id), '[]'
+            ) as categories,
+            (SELECT COUNT(*) FROM page_views pv WHERE pv.post_slug = p.slug)::int as views_count,
+            (SELECT COUNT(*) FROM likes l WHERE l.post_slug = p.slug)::int as likes_count,
+            (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
+          FROM posts p
+          ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
+          LIMIT ${limit} OFFSET ${offset}
+        `
+      }
     }
 
     const total = parseInt(totalResult[0].total as string)
     const totalPages = Math.ceil(total / limit)
-
-    // Get posts with pagination
-    let posts
-    const baseQuery = `
-      SELECT p.*,
-        COALESCE(
-          (SELECT json_agg(json_build_object('id', c.id, 'name', c.name, 'slug', c.slug))
-           FROM categories c
-           JOIN post_categories pc ON pc.category_id = c.id
-           WHERE pc.post_id = p.id), '[]'
-        ) as categories,
-        (SELECT COUNT(*) FROM page_views pv WHERE pv.post_slug = p.slug)::int as views_count,
-        (SELECT COUNT(*) FROM likes l WHERE l.post_slug = p.slug)::int as likes_count,
-        (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
-      FROM posts p
-      WHERE ${whereClause}
-      ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
-      LIMIT ${limit} OFFSET ${offset}
-    `
-
-    if (search && categoryId) {
-      posts = await sql.unsafe(baseQuery.replace('$search', `'${search.replace(/'/g, "''")}'`).replace('$categoryId', categoryId))
-    } else if (search) {
-      posts = await sql.unsafe(baseQuery.replace('$search', `'${search.replace(/'/g, "''")}'`))
-    } else if (categoryId) {
-      posts = await sql.unsafe(baseQuery.replace('$categoryId', categoryId))
-    } else {
-      posts = await sql.unsafe(baseQuery)
-    }
 
     return NextResponse.json({
       posts,
