@@ -12,6 +12,7 @@ export interface Post {
   content: string
   contentHtml?: string
   readingTime?: number
+  isPinned?: boolean
 }
 
 export function calculateReadingTime(content: string): number {
@@ -31,6 +32,7 @@ export async function getAllPosts(): Promise<Post[]> {
         p.content,
         p.image,
         p.published_at,
+        p.is_pinned,
         COALESCE(
           (SELECT json_agg(c.name)
            FROM categories c
@@ -39,7 +41,7 @@ export async function getAllPosts(): Promise<Post[]> {
         ) as categories
       FROM posts p
       WHERE p.published = true
-      ORDER BY p.published_at DESC
+      ORDER BY p.is_pinned DESC NULLS LAST, p.published_at DESC
     `
 
     return posts.map(post => ({
@@ -50,7 +52,8 @@ export async function getAllPosts(): Promise<Post[]> {
       image: post.image as string | undefined,
       categories: Array.isArray(post.categories) ? post.categories : [],
       content: post.content as string,
-      readingTime: calculateReadingTime(post.content as string)
+      readingTime: calculateReadingTime(post.content as string),
+      isPinned: post.is_pinned as boolean
     }))
   } catch (error) {
     console.error('Error fetching posts from database:', error)

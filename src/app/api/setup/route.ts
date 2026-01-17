@@ -100,6 +100,26 @@ export async function GET() {
     await sql`CREATE INDEX IF NOT EXISTS idx_page_views_created_at ON page_views(created_at)`
     await sql`CREATE INDEX IF NOT EXISTS idx_page_views_utm_source ON page_views(utm_source)`
 
+    // Add is_pinned column to posts if it doesn't exist
+    await sql`
+      ALTER TABLE posts ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT false
+    `
+
+    // Add ai_reviewed column to posts if it doesn't exist
+    await sql`
+      ALTER TABLE posts ADD COLUMN IF NOT EXISTS ai_reviewed BOOLEAN DEFAULT false
+    `
+
+    // Create settings table for storing configurations like writing style
+    await sql`
+      CREATE TABLE IF NOT EXISTS settings (
+        id SERIAL PRIMARY KEY,
+        key VARCHAR(100) UNIQUE NOT NULL,
+        value TEXT,
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `
+
     return NextResponse.json({ success: true, message: 'Database setup complete!' })
   } catch (error) {
     console.error('Setup error:', error)

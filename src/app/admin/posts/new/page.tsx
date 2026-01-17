@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -26,6 +26,134 @@ export default function NewPostPage() {
   const [showPreview, setShowPreview] = useState(false)
   const [showCategoryModal, setShowCategoryModal] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+
+  // Auto-save states
+  const [draftId, setDraftId] = useState<number | null>(null)
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const hasUnsavedChanges = useRef(false)
+
+  // Auto-save function
+  const autoSave = useCallback(async () => {
+    if (!title && !content) return
+    if (!hasUnsavedChanges.current) return
+
+    setAutoSaveStatus('saving')
+
+    try {
+      const plainText = content
+        .replace(/```[\s\S]*?```/g, '')
+        .replace(/`[^`]+`/g, '')
+        .replace(/#{1,6}\s/g, '')
+        .replace(/\*\*([^*]+)\*\*/g, '$1')
+        .replace(/\*([^*]+)\*/g, '$1')
+        .replace(/~~([^~]+)~~/g, '$1')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .replace(/!\[\]\([^)]+\)/g, '')
+        .replace(/^>\s/gm, '')
+        .replace(/^-\s/gm, '')
+        .replace(/\n+/g, ' ')
+        .trim()
+      const excerpt = plainText.slice(0, 500).trim()
+
+      if (draftId) {
+        // Update existing draft
+        const res = await fetch(`/api/admin/posts/${draftId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: title || 'Rascunho sem título',
+            excerpt,
+            content,
+            published: false,
+            categories: selectedCategories
+          })
+        })
+        if (res.ok) {
+          setAutoSaveStatus('saved')
+          setLastSavedAt(new Date())
+          hasUnsavedChanges.current = false
+        } else {
+          setAutoSaveStatus('error')
+        }
+      } else {
+        // Create new draft
+        const res = await fetch('/api/admin/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: title || 'Rascunho sem título',
+            excerpt,
+            content,
+            published: false,
+            categories: selectedCategories
+          })
+        })
+        const data = await res.json()
+        if (res.ok && data.id) {
+          setDraftId(data.id)
+          localStorage.setItem('currentDraftId', data.id.toString())
+          setAutoSaveStatus('saved')
+          setLastSavedAt(new Date())
+          hasUnsavedChanges.current = false
+        } else {
+          setAutoSaveStatus('error')
+        }
+      }
+    } catch {
+      setAutoSaveStatus('error')
+    }
+  }, [title, content, selectedCategories, draftId])
+
+  // Schedule auto-save when content changes
+  useEffect(() => {
+    if (title || content) {
+      hasUnsavedChanges.current = true
+      setAutoSaveStatus('idle')
+
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current)
+      }
+
+      autoSaveTimeoutRef.current = setTimeout(() => {
+        autoSave()
+      }, 3000) // Save 3 seconds after typing stops
+    }
+
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current)
+      }
+    }
+  }, [title, content, selectedCategories, autoSave])
+
+  // Load existing draft on mount
+  useEffect(() => {
+    const savedDraftId = localStorage.getItem('currentDraftId')
+    if (savedDraftId) {
+      fetch(`/api/admin/posts/${savedDraftId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.post && !data.post.published) {
+            setDraftId(parseInt(savedDraftId))
+            setTitle(data.post.title || '')
+            setContent(data.post.content || '')
+            setSelectedCategories(
+              Array.isArray(data.post.categories)
+                ? data.post.categories.map((c: Category) => c.id)
+                : []
+            )
+            hasUnsavedChanges.current = false
+          } else {
+            localStorage.removeItem('currentDraftId')
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem('currentDraftId')
+        })
+    }
+  }, [])
 
   useEffect(() => {
     fetch('/api/admin/auth')
@@ -93,6 +221,8 @@ export default function NewPostPage() {
       const data = await res.json()
 
       if (res.ok) {
+        // Clear draft from localStorage on successful publish/save
+        localStorage.removeItem('currentDraftId')
         router.push('/admin/posts')
       } else {
         setError(data.error || 'Erro ao criar post')
@@ -102,6 +232,17 @@ export default function NewPostPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const startNewPost = () => {
+    localStorage.removeItem('currentDraftId')
+    setDraftId(null)
+    setTitle('')
+    setContent('')
+    setSelectedCategories([])
+    setAutoSaveStatus('idle')
+    setLastSavedAt(null)
+    hasUnsavedChanges.current = false
   }
 
   const toggleCategory = (id: number) => {
@@ -150,9 +291,47 @@ export default function NewPostPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
             </Link>
-            <h1 className="text-xl font-bold">Novo Post</h1>
+            <h1 className="text-xl font-bold">{draftId ? 'Editando Rascunho' : 'Novo Post'}</h1>
+            {/* Auto-save indicator */}
+            <div className="flex items-center gap-2 text-xs">
+              {autoSaveStatus === 'saving' && (
+                <span className="text-yellow-400 flex items-center gap-1">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    className="w-3 h-3 border border-yellow-400/30 border-t-yellow-400 rounded-full"
+                  />
+                  Salvando...
+                </span>
+              )}
+              {autoSaveStatus === 'saved' && lastSavedAt && (
+                <span className="text-green-400 flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  Salvo às {lastSavedAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              )}
+              {autoSaveStatus === 'error' && (
+                <span className="text-red-400 flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  Erro ao salvar
+                </span>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-3">
+            {draftId && (
+              <button
+                type="button"
+                onClick={startNewPost}
+                className="px-3 py-2 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/10 transition-all"
+              >
+                + Novo
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setShowPreview(!showPreview)}
@@ -176,7 +355,7 @@ export default function NewPostPage() {
                   className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full"
                 />
               )}
-              Salvar
+              {published ? 'Publicar' : 'Salvar'}
             </button>
           </div>
         </div>

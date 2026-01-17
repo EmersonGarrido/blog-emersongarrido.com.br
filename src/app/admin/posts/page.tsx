@@ -24,6 +24,7 @@ interface Post {
   views_count: number
   likes_count: number
   comments_count: number
+  is_pinned: boolean
 }
 
 interface Pagination {
@@ -158,6 +159,20 @@ export default function AdminPostsPage() {
       }
     } catch (error) {
       console.error('Toggle publish error:', error)
+    }
+  }
+
+  const handleTogglePin = async (post: Post) => {
+    const action = post.is_pinned ? 'Desafixar' : 'Fixar'
+    if (!confirm(`${action} o post "${post.title}"?${!post.is_pinned ? ' O post fixado atual será desafixado.' : ''}`)) return
+
+    try {
+      const res = await fetch(`/api/admin/posts/${post.id}/pin`, { method: 'POST' })
+      if (res.ok) {
+        loadPosts()
+      }
+    } catch (error) {
+      console.error('Toggle pin error:', error)
     }
   }
 
@@ -366,7 +381,16 @@ export default function AdminPostsPage() {
                     >
                       <td className="px-4 py-3">
                         <Link href={`/admin/posts/${post.id}`} className="hover:text-white/80">
-                          <div className="font-medium">{post.title}</div>
+                          <div className="font-medium flex items-center gap-2">
+                            {post.is_pinned && (
+                              <span className="text-yellow-400" title="Post fixado">
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
+                                </svg>
+                              </span>
+                            )}
+                            {post.title}
+                          </div>
                           {post.excerpt && (
                             <div className="text-sm text-white/40 truncate max-w-xs">{post.excerpt}</div>
                           )}
@@ -435,6 +459,19 @@ export default function AdminPostsPage() {
                       </td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleTogglePin(post)}
+                            className={`p-2 rounded-lg transition-colors ${
+                              post.is_pinned
+                                ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+                                : 'hover:bg-white/10 text-white/40 hover:text-yellow-400'
+                            }`}
+                            title={post.is_pinned ? 'Desafixar post' : 'Fixar post'}
+                          >
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
+                            </svg>
+                          </button>
                           <Link
                             href={`/admin/posts/${post.id}`}
                             className="p-2 hover:bg-white/10 rounded-lg transition-colors"

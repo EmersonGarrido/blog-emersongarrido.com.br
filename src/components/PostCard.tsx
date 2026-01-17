@@ -133,6 +133,15 @@ export default function PostCard({ post, index }: PostCardProps) {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
+          {/* Pinned indicator */}
+          {post.isPinned && (
+            <div className="flex items-center gap-1.5 text-[var(--text-muted)] text-xs mb-1">
+              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
+              </svg>
+              <span>Post fixado</span>
+            </div>
+          )}
           <div className="flex items-center gap-1.5 flex-wrap">
             <Link href="/" className="font-semibold text-[15px] hover:underline">emersongarrido</Link>
             {/* Verified badge - Twitter/X style */}
