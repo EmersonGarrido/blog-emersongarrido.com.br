@@ -34,6 +34,12 @@ interface Pagination {
   totalPages: number
 }
 
+interface Counts {
+  all: number
+  published: number
+  draft: number
+}
+
 export default function AdminPostsPage() {
   const router = useRouter()
   const [posts, setPosts] = useState<Post[]>([])
@@ -46,6 +52,7 @@ export default function AdminPostsPage() {
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
   const [pagination, setPagination] = useState<Pagination | null>(null)
+  const [counts, setCounts] = useState<Counts>({ all: 0, published: 0, draft: 0 })
   const [migrating, setMigrating] = useState(false)
   const [migrateResult, setMigrateResult] = useState<string | null>(null)
 
@@ -63,6 +70,9 @@ export default function AdminPostsPage() {
       const data = await res.json()
       setPosts(data.posts || [])
       setPagination(data.pagination || null)
+      if (data.counts) {
+        setCounts(data.counts)
+      }
     } catch (error) {
       console.error('Load posts error:', error)
     } finally {
@@ -256,19 +266,34 @@ export default function AdminPostsPage() {
         <div className="space-y-4 mb-6">
           {/* Status tabs */}
           <div className="flex gap-2">
-            {['all', 'published', 'draft'].map((f) => (
-              <button
-                key={f}
-                onClick={() => { setFilter(f); setPage(1) }}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                  filter === f
-                    ? 'bg-white text-black'
-                    : 'text-white/40 hover:text-white/60'
-                }`}
-              >
-                {f === 'all' ? 'Todos' : f === 'published' ? 'Publicados' : 'Rascunhos'}
-              </button>
-            ))}
+            {['all', 'published', 'draft'].map((f) => {
+              const count = f === 'all' ? counts.all : f === 'published' ? counts.published : counts.draft
+              const label = f === 'all' ? 'Todos' : f === 'published' ? 'Publicados' : 'Rascunhos'
+              return (
+                <button
+                  key={f}
+                  onClick={() => { setFilter(f); setPage(1) }}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                    filter === f
+                      ? 'bg-white text-black'
+                      : 'text-white/40 hover:text-white/60'
+                  }`}
+                >
+                  {label}
+                  {count > 0 && (
+                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                      filter === f
+                        ? 'bg-black/20 text-black'
+                        : f === 'draft'
+                          ? 'bg-yellow-500/20 text-yellow-400'
+                          : 'bg-white/10 text-white/60'
+                    }`}>
+                      {count}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
           </div>
 
           {/* Search and filters row */}

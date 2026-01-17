@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
         AND (p.title ILIKE ${searchPattern} OR p.excerpt ILIKE ${searchPattern})
         ${status === 'published' ? sql`AND p.published = true` : status === 'draft' ? sql`AND p.published = false` : sql``}
         GROUP BY p.id
-        ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
+        ORDER BY p.created_at DESC
         LIMIT ${limit} OFFSET ${offset}
       `
     } else if (search) {
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
         FROM posts p
         WHERE (p.title ILIKE ${searchPattern} OR p.excerpt ILIKE ${searchPattern})
         ${status === 'published' ? sql`AND p.published = true` : status === 'draft' ? sql`AND p.published = false` : sql``}
-        ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
+        ORDER BY p.created_at DESC
         LIMIT ${limit} OFFSET ${offset}
       `
     } else if (categoryId) {
@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
         WHERE pc.category_id = ${catId}
         ${status === 'published' ? sql`AND p.published = true` : status === 'draft' ? sql`AND p.published = false` : sql``}
         GROUP BY p.id
-        ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
+        ORDER BY p.created_at DESC
         LIMIT ${limit} OFFSET ${offset}
       `
     } else {
@@ -141,7 +141,7 @@ export async function GET(request: NextRequest) {
             (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
           FROM posts p
           WHERE p.published = true
-          ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
+          ORDER BY p.created_at DESC
           LIMIT ${limit} OFFSET ${offset}
         `
       } else if (status === 'draft') {
@@ -159,7 +159,7 @@ export async function GET(request: NextRequest) {
             (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
           FROM posts p
           WHERE p.published = false
-          ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
+          ORDER BY p.created_at DESC
           LIMIT ${limit} OFFSET ${offset}
         `
       } else {
@@ -176,7 +176,7 @@ export async function GET(request: NextRequest) {
             (SELECT COUNT(*) FROM likes l WHERE l.post_slug = p.slug)::int as likes_count,
             (SELECT COUNT(*) FROM comments cm WHERE cm.post_slug = p.slug AND cm.is_approved = true)::int as comments_count
           FROM posts p
-          ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
+          ORDER BY p.created_at DESC
           LIMIT ${limit} OFFSET ${offset}
         `
       }
@@ -185,6 +185,20 @@ export async function GET(request: NextRequest) {
     const total = parseInt(totalResult[0].total as string)
     const totalPages = Math.ceil(total / limit)
 
+    // Get counts for all statuses (for filter badges)
+    const countsResult = await sql`
+      SELECT
+        COUNT(*) as total,
+        COUNT(*) FILTER (WHERE published = true) as published_count,
+        COUNT(*) FILTER (WHERE published = false) as draft_count
+      FROM posts
+    `
+    const counts = {
+      all: parseInt(countsResult[0].total as string),
+      published: parseInt(countsResult[0].published_count as string),
+      draft: parseInt(countsResult[0].draft_count as string)
+    }
+
     return NextResponse.json({
       posts,
       pagination: {
@@ -192,7 +206,8 @@ export async function GET(request: NextRequest) {
         limit,
         total,
         totalPages
-      }
+      },
+      counts
     })
   } catch (error) {
     console.error('Get posts error:', error)
