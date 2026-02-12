@@ -34,14 +34,25 @@ ORDER BY created_at DESC;
 
 ### 3. Revisar o Conteúdo
 
-Para cada post em rascunho, analise:
+Para cada post em rascunho, faça uma **revisão completa de português** (não só acentos):
 
+#### Gramática e Ortografia
+- **Acentuação:** Corrigir acentos (tô, tá, não, etc.)
+- **Concordância:** Verificar concordância verbal e nominal
+- **Regência:** Corrigir erros como "da onde" → "de onde"
+- **Pontuação:** Vírgulas, pontos, reticências no lugar certo
+
+#### Estrutura e Clareza
+- **Frases mal construídas:** Reformular frases confusas ou truncadas
+- **Conexão de ideias:** Garantir que o texto flui bem
+- **Parágrafos:** Manter 2-4 frases, não fragmentar demais
+
+#### Tom e Autenticidade
 - **Tom de voz:** O texto está conversacional e direto?
-- **Estrutura:** Parágrafos com 2-4 frases? Frases conectadas com vírgulas?
 - **Linguagem:** Usa "tô", "pra", "pro" em vez de formas formais?
 - **Autenticidade:** O texto soa como o Emerson (honesto, vulnerável, reflexivo)?
-- **Clareza:** As ideias estão claras e fluem bem?
-- **Gramática:** Há erros gramaticais graves?
+
+**IMPORTANTE:** Aplicar as correções diretamente no banco, não apenas listar. A revisão deve resultar em texto pronto pra publicar.
 
 ### 4. Fornecer Feedback
 

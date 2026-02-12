@@ -35,11 +35,13 @@ export default function NewPostPage() {
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const hasUnsavedChanges = useRef(false)
+  const isCreatingPost = useRef(false)
 
   // Auto-save function
   const autoSave = useCallback(async () => {
     if (!title && !content) return
     if (!hasUnsavedChanges.current) return
+    if (isCreatingPost.current) return // Prevent race condition with manual save
 
     setAutoSaveStatus('saving')
 
@@ -80,27 +82,34 @@ export default function NewPostPage() {
           setAutoSaveStatus('error')
         }
       } else {
-        // Create new draft
-        const res = await fetch('/api/admin/posts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title: title || 'Rascunho sem título',
-            excerpt,
-            content,
-            published: false,
-            categories: selectedCategories
+        // Create new draft - use lock to prevent race condition
+        if (isCreatingPost.current) return
+        isCreatingPost.current = true
+
+        try {
+          const res = await fetch('/api/admin/posts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              title: title || 'Rascunho sem título',
+              excerpt,
+              content,
+              published: false,
+              categories: selectedCategories
+            })
           })
-        })
-        const data = await res.json()
-        if (res.ok && data.id) {
-          setDraftId(data.id)
-          localStorage.setItem('currentDraftId', data.id.toString())
-          setAutoSaveStatus('saved')
-          setLastSavedAt(new Date())
-          hasUnsavedChanges.current = false
-        } else {
-          setAutoSaveStatus('error')
+          const data = await res.json()
+          if (res.ok && data.id) {
+            setDraftId(data.id)
+            localStorage.setItem('currentDraftId', data.id.toString())
+            setAutoSaveStatus('saved')
+            setLastSavedAt(new Date())
+            hasUnsavedChanges.current = false
+          } else {
+            setAutoSaveStatus('error')
+          }
+        } finally {
+          isCreatingPost.current = false
         }
       }
     } catch {
@@ -186,8 +195,21 @@ export default function NewPostPage() {
       return
     }
 
+    // Cancel any pending auto-save to prevent race condition
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current)
+      autoSaveTimeoutRef.current = null
+    }
+
+    // Wait if auto-save is currently creating a post
+    if (isCreatingPost.current) {
+      setError('Aguarde o salvamento automático terminar...')
+      return
+    }
+
     setLoading(true)
     setError('')
+    isCreatingPost.current = true
 
     try {
       // Auto-generate excerpt from first ~4 lines of content (strip markdown)
@@ -208,17 +230,34 @@ export default function NewPostPage() {
       // Get first ~500 chars for 4 lines
       const excerpt = plainText.slice(0, 500).trim()
 
-      const res = await fetch('/api/admin/posts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title,
-          excerpt,
-          content,
-          published,
-          categories: selectedCategories
+      let res
+      if (draftId) {
+        // Update existing draft instead of creating new post
+        res = await fetch(`/api/admin/posts/${draftId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title,
+            excerpt,
+            content,
+            published,
+            categories: selectedCategories
+          })
         })
-      })
+      } else {
+        // Create new post
+        res = await fetch('/api/admin/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title,
+            excerpt,
+            content,
+            published,
+            categories: selectedCategories
+          })
+        })
+      }
 
       const data = await res.json()
 
@@ -233,6 +272,7 @@ export default function NewPostPage() {
       setError('Erro ao criar post')
     } finally {
       setLoading(false)
+      isCreatingPost.current = false
     }
   }
 

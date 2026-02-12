@@ -84,6 +84,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/avatar.jpg" />
         <link rel="alternate" type="application/rss+xml" title="Emerson Garrido RSS Feed" href="/feed.xml" />
         <meta name="theme-color" content="#000000" />
+        <script src="https://api.promise.codes/pa.js" data-site="emersongarrido.com.br" defer></script>
       </head>
       <body className={`${inter.variable} ${lora.variable} font-sans min-h-screen`}>
         <Providers>{children}</Providers>
