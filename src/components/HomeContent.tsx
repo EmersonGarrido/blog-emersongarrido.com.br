@@ -22,6 +22,7 @@ interface ProfileSettings {
   instagram: string
   github: string
   linkedin: string
+  email: string
 }
 
 interface HomeContentProps {
@@ -39,7 +40,8 @@ const defaultProfile: ProfileSettings = {
   twitter: '',
   instagram: '',
   github: '',
-  linkedin: ''
+  linkedin: '',
+  email: 'emersongarrido.dev@gmail.com'
 }
 
 export default function HomeContent({ posts }: HomeContentProps) {
@@ -320,7 +322,35 @@ export default function HomeContent({ posts }: HomeContentProps) {
                     </svg>
                   </a>
                 )}
+                {profile.email && (
+                  <a
+                    href={`mailto:${profile.email}`}
+                    className="text-[var(--text-muted)] hover:text-red-500 transition-colors"
+                    title="Email"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </a>
+                )}
               </motion.div>
+              {profile.email && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 0.35 }}
+                >
+                  <a
+                    href={`mailto:${profile.email}`}
+                    className="inline-flex items-center gap-1.5 mt-1 text-sm text-[var(--text-muted)] hover:text-red-500 transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    {profile.email}
+                  </a>
+                </motion.div>
+              )}
             </div>
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
