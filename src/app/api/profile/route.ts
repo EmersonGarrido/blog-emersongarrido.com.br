@@ -13,7 +13,8 @@ const defaultProfile = {
   twitter: '',
   instagram: '',
   github: '',
-  linkedin: ''
+  linkedin: '',
+  email: 'emersongarrido.dev@gmail.com'
 }
 
 // Get public profile settings (no auth required)
