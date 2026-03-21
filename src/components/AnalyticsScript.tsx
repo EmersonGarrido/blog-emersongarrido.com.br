@@ -20,6 +20,8 @@ export function AnalyticsScript() {
       src="https://api.promise.codes/pa.js"
       data-site="emersongarrido.com.br"
       strategy="afterInteractive"
+      onLoad={() => console.log('[Analytics] pa.js carregado com sucesso')}
+      onError={(e) => console.error('[Analytics] Erro ao carregar pa.js:', e)}
     />
   )
 }
