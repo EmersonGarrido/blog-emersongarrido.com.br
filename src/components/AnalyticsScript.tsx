@@ -1,18 +1,25 @@
 'use client'
 
-import { useEffect } from 'react'
+import Script from 'next/script'
+import { useState, useEffect } from 'react'
 
 export function AnalyticsScript() {
+  const [shouldLoad, setShouldLoad] = useState(false)
+
   useEffect(() => {
     const isBio = window.location.hostname.startsWith('bio.')
-    if (isBio) return
-
-    const script = document.createElement('script')
-    script.src = 'https://api.promise.codes/pa.js'
-    script.dataset.site = 'emersongarrido.com.br'
-    script.defer = true
-    document.head.appendChild(script)
+    if (!isBio) {
+      setShouldLoad(true)
+    }
   }, [])
 
-  return null
+  if (!shouldLoad) return null
+
+  return (
+    <Script
+      src="https://api.promise.codes/pa.js"
+      data-site="emersongarrido.com.br"
+      strategy="afterInteractive"
+    />
+  )
 }

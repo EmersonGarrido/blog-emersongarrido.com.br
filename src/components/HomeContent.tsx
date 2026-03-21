@@ -386,49 +386,25 @@ export default function HomeContent({ posts }: HomeContentProps) {
             className="mt-3 flex items-center gap-1.5 text-[var(--text-muted)] text-sm"
           >
             <span>From</span>
-            <div className="group relative">
-              <div className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/18px-Flag_of_Brazil.svg.png" alt="Brasil" className="h-3 rounded-sm" />
-              </div>
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">Brasil</span>
-            </div>
-            <span className="text-[var(--text-muted)]">·</span>
-            <div className="group relative">
-              <div className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Bandeira_de_Mato_Grosso_do_Sul.svg/18px-Bandeira_de_Mato_Grosso_do_Sul.svg.png" alt="MS" className="h-3 rounded-sm" />
-              </div>
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">Campo Grande, MS</span>
-            </div>
-            <div className="group relative">
-              <div className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Bandeira_de_Mato_Grosso.svg/18px-Bandeira_de_Mato_Grosso.svg.png" alt="MT" className="h-3 rounded-sm" />
-              </div>
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">São José do Rio Claro, MT</span>
-            </div>
-            <div className="group relative">
-              <div className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Bandeira_do_Amazonas.svg/18px-Bandeira_do_Amazonas.svg.png" alt="AM" className="h-3 rounded-sm" />
-              </div>
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">Manaus, AM</span>
-            </div>
-            <div className="group relative">
-              <div className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Bandeira_do_estado_do_Rio_de_Janeiro.svg/18px-Bandeira_do_estado_do_Rio_de_Janeiro.svg.png" alt="RJ" className="h-3 rounded-sm" />
-              </div>
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">Rio de Janeiro, RJ</span>
-            </div>
-            <div className="group relative">
-              <div className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Bandeira_do_Distrito_Federal_%28Brasil%29.svg/18px-Bandeira_do_Distrito_Federal_%28Brasil%29.svg.png" alt="DF" className="h-3 rounded-sm" />
-              </div>
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">Brasília, DF</span>
-            </div>
-            <div className="group relative">
-              <div className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Bandeira_do_estado_de_S%C3%A3o_Paulo.svg/18px-Bandeira_do_estado_de_S%C3%A3o_Paulo.svg.png" alt="SP" className="h-3 rounded-sm" />
-              </div>
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">Campinas, Igaratá e Capital, SP</span>
-            </div>
+            {[
+              { flag: '\u{1F1E7}\u{1F1F7}', label: 'Brasil' },
+              { flag: '\u{1F4CD}', label: 'Campo Grande, MS' },
+              { flag: '\u{1F4CD}', label: 'S\u00E3o Jos\u00E9 do Rio Claro, MT' },
+              { flag: '\u{1F4CD}', label: 'Manaus, AM' },
+              { flag: '\u{1F4CD}', label: 'Rio de Janeiro, RJ' },
+              { flag: '\u{1F4CD}', label: 'Bras\u00EDlia, DF' },
+              { flag: '\u{1F4CD}', label: 'Campinas, Igarat\u00E1 e Capital, SP' },
+            ].map((loc, i) => (
+              <span key={loc.label} className="inline-flex items-center">
+                {i === 1 && <span className="text-[var(--text-muted)] mr-1.5">\u00B7</span>}
+                <span className="group relative">
+                  <span className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center cursor-pointer hover:scale-110 transition-transform text-sm">
+                    {loc.flag}
+                  </span>
+                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg z-10">{loc.label}</span>
+                </span>
+              </span>
+            ))}
           </motion.div>
 
           {/* Stats */}
@@ -482,6 +458,54 @@ export default function HomeContent({ posts }: HomeContentProps) {
           transition={{ duration: 0.5, delay: 0.6 }}
           className="border-t border-[var(--border-color)] origin-left"
         />
+
+        {/* Music Promo Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.7 }}
+          className="px-4 py-4"
+        >
+          <a
+            href="https://bio.emersongarrido.com.br"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group block relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-900/80 via-neutral-900 to-neutral-950 border border-emerald-500/20 p-5 hover:border-emerald-500/40 transition-all duration-300"
+          >
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-emerald-500/10 via-transparent to-transparent" />
+            <div className="absolute top-3 right-3 flex gap-1.5">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <motion.div
+                  key={i}
+                  className="w-1 bg-emerald-400/60 rounded-full"
+                  animate={{ height: [8, 16, 10, 20, 12][i % 5] === 8 ? [8, 18, 8] : [16, 8, 16] }}
+                  transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15, ease: 'easeInOut' }}
+                  style={{ height: [8, 16, 10, 20, 12][i] }}
+                />
+              ))}
+            </div>
+            <div className="relative z-10 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0 group-hover:bg-emerald-500/30 transition-colors">
+                <svg className="w-6 h-6 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-white font-semibold text-[15px]">
+                  {locale === 'en' ? 'Also a musician' : 'Tamb\u00E9m sou m\u00FAsico'}
+                </p>
+                <p className="text-emerald-200/70 text-sm mt-0.5 leading-snug">
+                  {locale === 'en'
+                    ? 'Lo-fi, ambient & instrumental tracks. Listen on Spotify and more.'
+                    : 'Lo-fi, ambient e instrumentais. Escute no Spotify e outras plataformas.'}
+                </p>
+              </div>
+              <svg className="w-5 h-5 text-emerald-400/60 shrink-0 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </a>
+        </motion.div>
 
         {/* Feed */}
         <div className="py-2">
