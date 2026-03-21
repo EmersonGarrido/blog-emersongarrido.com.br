@@ -386,25 +386,7 @@ export default function HomeContent({ posts }: HomeContentProps) {
             className="mt-3 flex items-center gap-1.5 text-[var(--text-muted)] text-sm"
           >
             <span>From</span>
-            {[
-              { flag: '\u{1F1E7}\u{1F1F7}', label: 'Brasil' },
-              { flag: '\u{1F4CD}', label: 'Campo Grande, MS' },
-              { flag: '\u{1F4CD}', label: 'S\u00E3o Jos\u00E9 do Rio Claro, MT' },
-              { flag: '\u{1F4CD}', label: 'Manaus, AM' },
-              { flag: '\u{1F4CD}', label: 'Rio de Janeiro, RJ' },
-              { flag: '\u{1F4CD}', label: 'Bras\u00EDlia, DF' },
-              { flag: '\u{1F4CD}', label: 'Campinas, Igarat\u00E1 e Capital, SP' },
-            ].map((loc, i) => (
-              <span key={loc.label} className="inline-flex items-center">
-                {i === 1 && <span className="text-[var(--text-muted)] mr-1.5">\u00B7</span>}
-                <span className="group relative">
-                  <span className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center cursor-pointer hover:scale-110 transition-transform text-sm">
-                    {loc.flag}
-                  </span>
-                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg z-10">{loc.label}</span>
-                </span>
-              </span>
-            ))}
+            <span className="text-[var(--text-secondary)]">MS, MT, AM, RJ, DF, SP</span>
           </motion.div>
 
           {/* Stats */}
