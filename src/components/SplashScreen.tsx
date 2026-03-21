@@ -7,6 +7,11 @@ export default function SplashScreen({ children }: { children: React.ReactNode }
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    const isBio = window.location.hostname.startsWith('bio.') || window.location.pathname.startsWith('/bio')
+    if (isBio) {
+      setIsLoading(false)
+      return
+    }
     const timer = setTimeout(() => {
       setIsLoading(false)
     }, 2000)

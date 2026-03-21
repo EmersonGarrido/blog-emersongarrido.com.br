@@ -2,13 +2,30 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
+  const hostname = request.headers.get('host') || ''
+  const isBio = hostname.startsWith('bio.')
+
+  if (isBio) {
+    const url = request.nextUrl.clone()
+
+    if (url.pathname === '/') {
+      url.pathname = '/bio'
+      return NextResponse.rewrite(url)
+    }
+
+    if (!url.pathname.startsWith('/api/')) {
+      url.pathname = `/bio${url.pathname}`
+      return NextResponse.rewrite(url)
+    }
+
+    return NextResponse.next()
+  }
+
   const response = NextResponse.next()
 
-  // Check if locale cookie already exists
   const localeCookie = request.cookies.get('locale')
 
   if (!localeCookie) {
-    // Detect from Accept-Language header
     const acceptLanguage = request.headers.get('accept-language')
     let locale = 'pt-BR'
 
@@ -30,10 +47,11 @@ export function middleware(request: NextRequest) {
       }
     }
 
-    // Set cookie for future requests
     response.cookies.set('locale', locale, {
-      maxAge: 60 * 60 * 24 * 365, // 1 year
+      maxAge: 60 * 60 * 24 * 365,
       path: '/',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
     })
   }
 
@@ -41,5 +59,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)'],
 }

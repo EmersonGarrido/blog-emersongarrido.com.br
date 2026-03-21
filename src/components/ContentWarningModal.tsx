@@ -9,7 +9,9 @@ export default function ContentWarningModal() {
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
-    // Check if user has already accepted
+    const isBio = window.location.hostname.startsWith('bio.') || window.location.pathname.startsWith('/bio')
+    if (isBio) return
+
     const hasAccepted = localStorage.getItem(STORAGE_KEY)
     if (!hasAccepted) {
       setIsOpen(true)
